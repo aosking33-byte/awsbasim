@@ -45,7 +45,7 @@ const trueFalseGame = {
         while(this.localBank.mix.length < 300) {
             let t = rawQuestions[Math.floor(Math.random() * rawQuestions.length)];
             this.localBank.mix.push({
-                question: t.q + (counter > rawQuestions.length ? ` (تحدي رقم ${counter})` : ''),
+                question: t.q + (counter > rawQuestions.length ? ` (سؤال ${counter})` : ''),
                 options: ["✅ صح", "❌ خطأ"],
                 answer_index: t.a
             });
@@ -63,39 +63,77 @@ const trueFalseGame = {
         }
         
         setupScreen.innerHTML = `
-            <div class="setup-container" style="max-width: 600px; margin: 40px auto; background: var(--bg-card); padding: 30px; border-radius: 20px; text-align: center;">
-                <h2 style="margin-bottom:20px; font-size: 2rem; color: var(--color-primary);">إعدادات الصح والخطأ 🚦</h2>
+            <div class="setup-container">
+                <h2 class="screen-title">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <span>إعداد تحدي الصح والخطأ</span>
+                </h2>
                 
-                <div style="margin-bottom:20px; text-align: right;">
-                    <label style="display:block; margin-bottom:8px; font-weight:bold;">مصدر الأسئلة:</label>
-                    <select id="tf-source-select" class="form-input" style="width: 100%; padding: 10px; font-size: 1.1rem; border-radius: 10px;">
-                        <option value="local" ${!app.settings.geminiApiKey ? 'selected' : ''}>البنك المحلي (بدون إنترنت)</option>
-                        <option value="ai" ${app.settings.geminiApiKey ? 'selected' : ''}>الذكاء الاصطناعي (أسئلة لانهائية)</option>
-                    </select>
-                    <small style="display:block; margin-top:5px; color:var(--color-warning);">ملاحظة: الذكاء الاصطناعي يتطلب إضافة المفتاح في الإعدادات الرئيسية.</small>
+                <div class="setup-section">
+                    <h3>مصدر الأسئلة:</h3>
+                    <div class="mode-selector">
+                        <div class="mode-option ${!app.settings.geminiApiKey ? 'active' : ''}" id="tf-source-local" onclick="trueFalseGame.setSource('local')">
+                            <svg class="icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>
+                            <div>
+                                <strong>البنك المحلي (بدون إنترنت)</strong>
+                                <span>300 سؤال مدمج وجاهز للعب الفوري.</span>
+                            </div>
+                        </div>
+                        <div class="mode-option ${app.settings.geminiApiKey ? 'active' : ''}" id="tf-source-ai" onclick="trueFalseGame.setSource('ai')">
+                            <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="9" y1="2" x2="9" y2="4"></line><line x1="15" y1="2" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="22"></line><line x1="15" y1="20" x2="15" y2="22"></line><line x1="20" y1="9" x2="22" y2="9"></line><line x1="20" y1="15" x2="22" y2="15"></line><line x1="2" y1="9" x2="4" y2="9"></line><line x1="2" y1="15" x2="4" y2="15"></line></svg>
+                            <div>
+                                <strong>توليد بالذكاء الاصطناعي (لانهائي)</strong>
+                                <span>يولد لك أسئلة لا تنتهي أبدًا بفضل Gemini.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="setup-section" id="tf-count-section" style="${app.settings.geminiApiKey ? 'display: none;' : ''}">
+                    <h3>عدد الأسئلة في الجولة:</h3>
+                    <input type="number" id="tf-count-input" class="form-input" value="15" min="5" max="100" style="width:100%; max-width: 200px; text-align: center;">
+                    <small style="display:block; margin-top:5px; color:var(--text-muted);">الحد الأقصى للبنك المحلي هو 100 سؤال في الجولة الواحدة.</small>
                 </div>
                 
-                <div style="margin-bottom:30px; text-align: right;">
-                    <label style="display:block; margin-bottom:8px; font-weight:bold;">عدد الأسئلة في الجولة:</label>
-                    <input type="number" id="tf-count-input" class="form-input" value="15" min="5" max="50" style="width: 100%; padding: 10px; font-size: 1.1rem; border-radius: 10px;">
-                </div>
-                
-                <div style="display:flex; gap: 15px; justify-content: center;">
-                    <button class="btn btn-secondary" onclick="app.showScreen('home-screen')">عودة للرئيسية</button>
-                    <button class="btn btn-primary" onclick="trueFalseGame.startQuiz()" style="background: linear-gradient(135deg, #10b981, #059669);">بدء اللعب الان! 🚀</button>
+                <div class="setup-actions">
+                    <button class="btn btn-back" onclick="app.showScreen('home-screen')">رجوع</button>
+                    <button class="btn btn-primary btn-large" onclick="trueFalseGame.startQuiz()">ابدأ التحدي الآن</button>
                 </div>
             </div>
         `;
         
+        this.source = app.settings.geminiApiKey ? 'ai' : 'local';
         app.showScreen('tf-setup-screen');
     },
 
+    setSource(src) {
+        if (src === 'ai' && !app.settings.geminiApiKey) {
+            app.showErr("يجب إضافة مفتاح Gemini API Key في لوحة الإعدادات لتفعيل هذه الميزة.");
+            return;
+        }
+        this.source = src;
+        document.getElementById('tf-source-local').classList.remove('active');
+        document.getElementById('tf-source-ai').classList.remove('active');
+        document.getElementById('tf-source-' + src).classList.add('active');
+
+        // Hide count input if AI is selected (since it's infinite)
+        if (src === 'ai') {
+            document.getElementById('tf-count-section').style.display = 'none';
+        } else {
+            document.getElementById('tf-count-section').style.display = 'block';
+        }
+    },
+
     async startQuiz() {
-        const sourceSelect = document.getElementById('tf-source-select');
-        const countInput = document.getElementById('tf-count-input');
-        
-        if (sourceSelect) this.source = sourceSelect.value;
-        if (countInput) this.totalQuestions = parseInt(countInput.value) || 15;
+        if (this.source === 'local') {
+            const countInput = document.getElementById('tf-count-input');
+            this.totalQuestions = parseInt(countInput.value) || 15;
+            if (this.totalQuestions > 100) this.totalQuestions = 100;
+        } else {
+            // For AI, we just generate 20 at a time, but the game has no "Total" limit. 
+            // The user plays until they click "End Game". We'll just generate 20 for now.
+            this.totalQuestions = 20; 
+        }
 
         app.showScreen('loading-screen');
         this.currentQuestionIndex = 0;
@@ -106,6 +144,7 @@ const trueFalseGame = {
                 this.questions = await this.generateQuestionsFromAI();
             } catch (error) {
                 console.error("AI Generation failed, falling back to local database:", error);
+                this.source = 'local';
                 this.loadLocalQuestions();
             }
         } else {
@@ -115,6 +154,24 @@ const trueFalseGame = {
         if (this.questions.length > 0) {
             this.setupGoldenQuestions();
             app.showScreen('quiz-screen');
+            
+            // VERY IMPORTANT: Override the onclick attributes of the buttons in quiz-screen to call our methods!
+            document.getElementById('reveal-answer-btn').setAttribute('onclick', 'trueFalseGame.revealAnswer()');
+            document.getElementById('next-question-btn').setAttribute('onclick', 'trueFalseGame.nextQuestion()');
+
+            // Add an "End Game" button dynamically if it doesn't exist next to Next Question
+            let endBtn = document.getElementById('tf-end-game-btn');
+            if (!endBtn) {
+                endBtn = document.createElement('button');
+                endBtn.id = 'tf-end-game-btn';
+                endBtn.className = 'btn btn-danger hidden';
+                endBtn.innerHTML = '🛑 إنهاء اللعبة';
+                endBtn.style.marginRight = '10px';
+                endBtn.onclick = () => this.endGame();
+                document.getElementById('next-question-btn').parentNode.appendChild(endBtn);
+            }
+            endBtn.classList.remove('hidden');
+
             this.showQuestion();
         } else {
             document.getElementById('question-text').innerText = "فشل تحميل الأسئلة.";
@@ -157,6 +214,10 @@ const trueFalseGame = {
         if (!response.ok) throw new Error('API Error');
         const data = await response.json();
         let text = data.candidates[0].content.parts[0].text;
+        
+        // clean up markdown from Gemini just in case
+        text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
         let aiQuestions = JSON.parse(text);
         
         return aiQuestions.map(q => ({
@@ -166,8 +227,21 @@ const trueFalseGame = {
         }));
     },
 
-    showQuestion() {
+    async showQuestion() {
         this.hasAnswered = false;
+        
+        // Infinite AI mode: fetch more questions when running low!
+        if (this.source === 'ai' && this.currentQuestionIndex >= this.questions.length - 2) {
+            document.getElementById('question-counter').innerText = `جاري توليد أسئلة جديدة...`;
+            try {
+                const moreQ = await this.generateQuestionsFromAI();
+                this.questions.push(...moreQ);
+                this.setupGoldenQuestions(); // re-roll golden questions for the new batch
+            } catch(e) {
+                console.error("Failed to fetch more AI questions", e);
+            }
+        }
+
         this.currentQuestion = this.questions[this.currentQuestionIndex];
         
         app.currentRoundAnswers = {};
@@ -203,12 +277,14 @@ const trueFalseGame = {
             });
             app.updateSidebarUI();
 
-            document.getElementById('question-counter').innerText = `السؤال ${this.currentQuestionIndex + 1} من ${this.questions.length} (صح وخطأ)`;
+            const limitText = this.source === 'ai' ? 'لانهائي' : this.questions.length;
+            document.getElementById('question-counter').innerText = `السؤال ${this.currentQuestionIndex + 1} / ${limitText} (صح وخطأ)`;
             document.getElementById('question-text').innerText = this.currentQuestion.question;
             document.getElementById('options-container').innerHTML = ''; // Options on phone
             
             document.getElementById('reveal-answer-btn').classList.remove('hidden');
             document.getElementById('next-question-btn').classList.add('hidden');
+            document.getElementById('tf-end-game-btn').classList.add('hidden');
 
             this.startTimer();
         }, delayMs);
@@ -293,6 +369,7 @@ const trueFalseGame = {
         app.updatePlayersUI();
         document.getElementById('reveal-answer-btn').classList.add('hidden');
         document.getElementById('next-question-btn').classList.remove('hidden');
+        document.getElementById('tf-end-game-btn').classList.remove('hidden');
 
         const statusMsg = document.getElementById('question-status-msg');
         statusMsg.classList.remove('hidden');
@@ -315,18 +392,23 @@ const trueFalseGame = {
         if (this.currentQuestionIndex < this.questions.length) {
             this.showQuestion();
         } else {
-            app.playSound('success');
-            document.getElementById('question-text').innerText = "🎉 انتهت جولة الصح والخطأ!";
-            document.getElementById('options-container').innerHTML = `
-                <div style="grid-column: span 2; text-align: center; padding: 40px;">
-                    <button class="btn btn-secondary" onclick="trueFalseGame.setupSettings()">العب مرة أخرى</button>
-                    <button class="btn btn-back" onclick="app.showScreen('home-screen')">القائمة الرئيسية</button>
-                </div>
-            `;
-            document.getElementById('reveal-answer-btn').classList.add('hidden');
-            document.getElementById('next-question-btn').classList.add('hidden');
-            app.broadcast({ type: 'game-over' });
+            if (this.source === 'local') {
+                this.endGame();
+            }
         }
+    },
+
+    endGame() {
+        app.playSound('success');
+        
+        // Restore default onclicks for safety
+        document.getElementById('reveal-answer-btn').setAttribute('onclick', 'quiz.revealAnswer()');
+        document.getElementById('next-question-btn').setAttribute('onclick', 'quiz.nextQuestion()');
+        const endBtn = document.getElementById('tf-end-game-btn');
+        if(endBtn) endBtn.remove();
+        
+        app.broadcast({ type: 'game-over' });
+        app.endContest(); // This will show the podium screen
     }
 };
 
