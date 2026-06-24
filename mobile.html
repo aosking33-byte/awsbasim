@@ -104,7 +104,7 @@
         @media(max-height:650px){.power-card{padding:10px 14px;margin-bottom:10px;}.pc-icon{font-size:1.8rem;margin-bottom:4px;}.logo-area{margin-bottom:10px;}.logo-emoji{font-size:2rem;}.card{padding:16px;}}
         @media(orientation:landscape) and (max-height:500px){.options-grid{grid-template-columns:repeat(4,1fr);}.opt-btn{min-height:55px;padding:10px 6px;}.power-card{display:none;}}
     </style>
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
 </head>
 <body>
 
@@ -231,14 +231,25 @@ if (!roomId) {
 }
 
 function initPeerConnection() {
-    setConn(false, 'جاري الاتصال بالتلفزيون...');
-    peer = new Peer(); // Auto-assign a random ID to the mobile
+    setConn(false, 'جاري الاتصال بالخوادم المركزية...');
+    peer = new Peer({
+        config: {'iceServers': [
+            { url: 'stun:stun.l.google.com:19302' },
+            { url: 'stun:stun1.l.google.com:19302' }
+        ]}
+    });
+
+    let connectionTimeout = setTimeout(() => {
+        setConn(false, 'الشبكة ضعيفة، نعاود المحاولة...');
+        peer.reconnect();
+    }, 8000);
 
     peer.on('open', (id) => {
-        // Connect to TV Host
-        peerConn = peer.connect(roomId);
+        setConn(false, 'جاري الاتصال بالتلفزيون...');
+        peerConn = peer.connect(roomId, { reliable: true });
 
         peerConn.on('open', () => {
+            clearTimeout(connectionTimeout);
             setConn(true, 'متصل بالتلفزيون ✓');
         });
 

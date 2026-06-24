@@ -1792,7 +1792,12 @@ const app = {
         if (rcd) rcd.innerText = `ROOM: ${roomId.substring(4).toUpperCase()}`;
 
         // ── Initialize WebRTC Host (PeerJS) ──
-        this.peer = new Peer(roomId);
+        this.peer = new Peer(roomId, {
+            config: {'iceServers': [
+                { url: 'stun:stun.l.google.com:19302' },
+                { url: 'stun:stun1.l.google.com:19302' }
+            ]}
+        });
 
         this.peer.on('open', (id) => {
             console.log('✅ WebRTC Room ready:', id, '| URL:', joinUrl);
