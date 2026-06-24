@@ -234,6 +234,16 @@ const quiz = {
             }
         });
         localStorage.setItem('family_tv_played_questions', JSON.stringify(updatedPlayed.slice(-200))); // Store last 200 questions to manage storage size
+        
+        // --- Golden Question Setup ---
+        this.bonusIndices = [];
+        this.currentMultiplier = 1;
+        // Randomly pick 1 or 2 indices for golden questions (avoiding the very first and last question if possible)
+        const numBonuses = Math.random() < 0.5 ? 1 : 2;
+        for(let i=0; i<numBonuses; i++) {
+            const bIdx = Math.floor(Math.random() * (this.questions.length - 2)) + 1;
+            if(!this.bonusIndices.includes(bIdx)) this.bonusIndices.push(bIdx);
+        }
     },
 
 
@@ -322,6 +332,25 @@ const quiz = {
         // Reset and broadcast question for Kahoot-style answering mode
         app.currentRoundAnswers = {};
         app.currentCorrectAnswerIndex = this.currentQuestion.answer_index;
+        
+        // --- Golden Question Logic ---
+        this.currentMultiplier = 1;
+        if (this.bonusIndices.includes(this.currentQuestionIndex)) {
+            this.currentMultiplier = Math.random() < 0.5 ? 2 : 3;
+            app.playSound('success'); // Play exciting sound
+            
+            // Show Golden Overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'bonus-overlay';
+            overlay.innerHTML = `<h1>🚨 سؤال ذهبي! 🌟</h1><h2>الإجابة الصحيحة تمنحك ${this.currentMultiplier} نقاط!</h2>`;
+            document.body.appendChild(overlay);
+            
+            setTimeout(() => {
+                overlay.classList.add('fade-out');
+                setTimeout(() => overlay.remove(), 1000);
+            }, 3500);
+        }
+
         // Broadcast full question text and options to mobile phones
         app.broadcast({
             type: 'question-start',
@@ -452,7 +481,8 @@ const quiz = {
                 playerResults[p.name] = isCorrect;
 
                 if (isCorrect) {
-                    const pts = p.quizMultiplier ? p.quizMultiplier : 1;
+                    const basePts = this.currentMultiplier || 1;
+                    const pts = p.quizMultiplier ? Math.max(basePts, p.quizMultiplier) : basePts;
                     p.score += pts;
                     correctPlayers.push(p.name);
                 }

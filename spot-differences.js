@@ -20,45 +20,77 @@ const spotDiff = {
     isPlaying: false,
     hasAnswered: false,
 
-    startGame() {
+        startGame() {
         app.initAudio();
         this.isPlaying = true;
         this.hasAnswered = false;
         
-        // Randomize correct difference count between 3 and 7
-        this.diffCount = 3 + Math.floor(Math.random() * 5); // 3, 4, 5, 6, 7
-        
-        // Randomize cartoon themes on each start for maximum variation
-        const themes = ['space', 'neon', 'nature'];
-        this.selectedTheme = themes[Math.floor(Math.random() * themes.length)];
+        // --- Golden Question Logic ---
+        this.currentMultiplier = 1;
+        let delayMs = 0;
+        // 15% chance for a Spot game round to be Golden
+        if (Math.random() < 0.15) {
+            this.currentMultiplier = Math.random() < 0.5 ? 2 : 3;
+            app.playSound('success'); // Play exciting sound
+            
+            // Show Golden Overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'bonus-overlay';
+            overlay.innerHTML = <h1>🚨 جولة ذهبية! 🌟</h1><h2>الإجابة الصحيحة تمنحك  نقاط!</h2>;
+            document.body.appendChild(overlay);
+            
+            setTimeout(() => {
+                overlay.classList.add('fade-out');
+                setTimeout(() => overlay.remove(), 1000);
+            }, 3500);
+            
+            delayMs = 3500;
+        }
 
-        // Prepare screens and buttons
-        app.showScreen('spot-game-screen');
-        document.getElementById('spot-progress').innerText = `احسب الفروقات بين اللوحتين واختر الإجابة الصحيحة`;
-        document.getElementById('spot-game-result').classList.add('hidden');
-        document.getElementById('spot-next-btn').classList.add('hidden');
-        document.getElementById('spot-reveal-btn').classList.remove('hidden');
+        setTimeout(() => {
+            // Randomize correct difference count between 3 and 7
+            this.diffCount = 3 + Math.floor(Math.random() * 5); // 3, 4, 5, 6, 7
+            
+            // Randomize cartoon themes on each start for maximum variation
+            const themes = ['space', 'neon', 'nature'];
+            this.selectedTheme = themes[Math.floor(Math.random() * themes.length)];
 
-        // Init Canvases
-        this.canvasOriginal = document.getElementById('canvas-original');
-        this.canvasModified = document.getElementById('canvas-modified');
-        this.ctxOrig = this.canvasOriginal.getContext('2d');
-        this.ctxMod = this.canvasModified.getContext('2d');
+            // Prepare screens and buttons
+            app.showScreen('spot-game-screen');
+            document.getElementById('spot-progress').innerText = احسب الفروقات بين اللوحتين واختر الإجابة الصحيحة;
+            document.getElementById('spot-game-result').classList.add('hidden');
+            document.getElementById('spot-next-btn').classList.add('hidden');
+            document.getElementById('spot-reveal-btn').classList.remove('hidden');
 
-        // Disable canvas clicking logic (just set it to null)
-        this.canvasModified.onclick = null;
+            // Init Canvases
+            this.canvasOriginal = document.getElementById('canvas-original');
+            this.canvasModified = document.getElementById('canvas-modified');
+            this.ctxOrig = this.canvasOriginal.getContext('2d');
+            this.ctxMod = this.canvasModified.getContext('2d');
 
-        // Generate level elements
-        this.generateLevel();
-        
-        // Generate Multiple Choice Options
-        this.generateOptions();
+            // Disable canvas clicking logic
+            this.canvasModified.onclick = null;
 
-        // Draw elements on canvas
-        this.drawCanvases();
-        
-        // Start 60s timer
-        this.startTimer();
+            // Generate level elements
+            this.generateLevel();
+            
+            // Generate Multiple Choice Options
+            this.generateOptions();
+
+            // Draw elements on canvas
+            this.drawCanvases();
+            
+            // Broadcast game start to mobiles
+            app.broadcast({
+                type: 'question-start',
+                question: 'كم عدد الاختلافات بين الصورتين؟',
+                options: this.options
+            });
+            app.updateSidebarUI();
+
+            // Start 60s timer
+            this.startTimer();
+        }, delayMs);
     },
 
     generateOptions() {
@@ -332,7 +364,8 @@ const spotDiff = {
                 playerResults[p.name] = isCorrect;
 
                 if (isCorrect) {
-                    const pts = p.quizMultiplier ? p.quizMultiplier : 1;
+                    const basePts = this.currentMultiplier || 1;
+                    const pts = p.quizMultiplier ? Math.max(basePts, p.quizMultiplier) : basePts;
                     p.score += pts;
                     correctPlayers.push(p.name);
                 }
