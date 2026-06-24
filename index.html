@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سهرة العائلة | ألعاب جماعية للتلفزيون</title>
+    <!-- Google Fonts fallback (Tajawal) loads online, but system CSS fallbacks are in style.css for offline -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Splash Screen (Autoplay Permission Trigger) -->
+    <div id="splash-screen" class="spot-result-overlay" style="background: rgba(10, 11, 16, 0.96); z-index: 1000;">
+        <div class="result-box" style="border-color: var(--color-secondary); box-shadow: 0 0 50px var(--color-secondary-glow); max-width: 650px;">
+            <div class="card-icon" style="color: var(--color-secondary); font-size: 5rem; margin-bottom: 20px; animation: pulse 1.5s infinite alternate;">
+                <svg class="icon logo-icon" viewBox="0 0 24 24" style="width: 5.5rem; height: 5.5rem;"><rect x="2" y="6" width="20" height="12" rx="3"></rect><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"></svg>
+            </div>
+            <h1 style="font-size: 3.5rem; font-weight: 900; margin-bottom: 15px; background: linear-gradient(135deg, #ffffff 40%, var(--color-secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">سهرة العائلة</h1>
+            <p style="font-size: 1.35rem; color: var(--text-muted); margin-bottom: 35px; line-height: 1.6;">مرحباً بكم في تحديات الذكاء والإثارة العائلية المخصصة للتلفزيون. اضغطوا للبدء وتشغيل المؤثرات والموسيقى الحماسية!</p>
+            <button class="btn btn-secondary btn-large" onclick="app.startApp()" style="padding: 20px 45px; font-size: 1.5rem; border-radius: 20px;">دخول وبدء السهرة 🎮</button>
+        </div>
+    </div>
+
+    <!-- Background Glow Effects -->
+    <div class="glow-bg">
+        <div class="glow-circle glow-1"></div>
+        <div class="glow-circle glow-2"></div>
+    </div>
+
+    <!-- Main App Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="main-header">
+            <div class="logo" onclick="app.showScreen('home-screen')">
+                <svg class="icon logo-icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"></rect><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"></svg>
+                <span>سهرة <span>العائلة</span></span>
+            </div>
+            <div class="header-controls">
+                <button class="icon-btn highlight" id="end-contest-header-btn" onclick="app.endContest()" title="إنهاء السباق وتتويج الفائز" style="background: rgba(255, 190, 11, 0.15); border-color: #ffbe0b; color: #ffbe0b;">
+                    <svg class="icon" viewBox="0 0 24 24" style="stroke: #ffbe0b; fill: none;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 1 6 6v5a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8a6 6 0 0 1 6-6z"></path></svg>
+                </button>
+                <button id="sound-toggle" class="icon-btn" onclick="app.toggleSound()" title="كتم/تفعيل الصوت">
+                    <!-- Inline SVG sound icon loaded dynamically by app.js -->
+                </button>
+                <button class="icon-btn" onclick="app.toggleSettingsWidget()" title="الإعدادات ومفتاح AI">
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dynamic Screens (SPA) -->
+        <main class="main-content">
+
+            <!-- Screen 1: Home Screen -->
+            <section id="home-screen" class="app-screen active">
+                <div class="hero-section">
+                    <h1 class="hero-title">ألعاب عائلية جماعية ذكية وممتعة</h1>
+                </div>
+                
+                <!-- Player Management Setup Panel -->
+                <div class="players-setup-container" style="display: grid; grid-template-columns: 1fr 300px; gap: 20px;">
+                    <div>
+                        <div class="players-input-box">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem; stroke: var(--color-primary); fill: none;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                            <input type="text" id="player-name-input" placeholder="اكتب اسم المتسابق واضغط Enter أو زر إضافة..." maxlength="15">
+                            <button class="btn btn-primary" onclick="app.addPlayer(document.getElementById('player-name-input').value); document.getElementById('player-name-input').value=''">إضافة متسابق</button>
+                        </div>
+                        <div class="players-badge-list">
+                            <span class="players-count-badge">المتسابقون المسجلون (<span id="players-count">0</span>):</span>
+                            <div id="players-list" class="players-list-row">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Setup Remote QR Registration -->
+                    <div class="setup-remote-qr-card" style="background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 18px; padding: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span style="font-size: 1.1rem; font-weight: bold; color: var(--color-secondary); margin-bottom: 5px;">📱 انضموا بجوالاتكم للعب!</span>
+                        <p style="font-size: 0.75rem; color: #bbb; margin-bottom: 10px;">سجلوا أسماءكم واستلموا بطاقات القوة السرية!</p>
+                        <div id="setup-qr-container" style="background: white; padding: 8px; border-radius: 10px; display: inline-block;">
+                            <span style="color: black; font-size: 0.8rem;">جاري جلب الرمز...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-cards-container">
+                    <!-- Game 1: AI Trivia -->
+                    <div class="game-card" onclick="app.openGameSetup('quiz')">
+                        <div class="card-badge">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1 0-3.12 3 3 0 0 1 0-3.88 2.5 2.5 0 0 1 0-3.12A2.5 2.5 0 0 1 9.5 2zM14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 0-3.12 3 3 0 0 0 0-3.88 2.5 2.5 0 0 0 0-3.12A2.5 2.5 0 0 0 14.5 2z"></svg> ذكاء اصطناعي
+                        </div>
+                        <div class="card-icon">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 4.5rem; height: 4.5rem;"><path d="M15 14c.2-.2.4-.4.6-.7C16.8 11.7 17 10 15.8 8.3 14.5 6.6 12 6.2 10.3 7.4c-1.4 1-1.9 2.7-1.3 4.3.2.4.4.8.7 1.1.8.8 1.3 1.8 1.3 2.9V18h4v-2.3c0-1.1.5-2.1 1.3-2.9zM10 22h4M12 2v2M4.9 4.9l1.4 1.4M19.1 4.9l-1.4 1.4M2 12h2M20 12h2"></svg>
+                        </div>
+                        <h2 class="card-title">تحدي المعرفة والذكاء</h2>
+                        <p class="card-desc">أسئلة خيارات متعددة تتجدد باستمرار بمختلف المجالات مع مؤقت 30 ثانية.</p>
+                        <button class="btn btn-primary card-btn">ابدأ اللعب <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
+                    </div>
+
+                    <!-- Game 2: Spot the Difference -->
+                    <div class="game-card" onclick="app.openGameSetup('spot')">
+                        <div class="card-badge highlight">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"></svg> توليد ذكي
+                        </div>
+                        <div class="card-icon">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 4.5rem; height: 4.5rem;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </div>
+                        <h2 class="card-title">أوجد الفروقات البصرية</h2>
+                        <p class="card-desc">قارن بين لوحتين وتوقع عدد الفروق المخفية قبل انتهاء الوقت. لعبة سرعة بديهة عائلية!</p>
+                        <button class="btn btn-secondary card-btn">ابدأ اللعب <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
+                    </div>
+
+                    <!-- Game 3: Taboo -->
+                    <div class="game-card" onclick="partyGames.initGame('taboo')">
+                        <div class="card-badge"><svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><polygon points="12 2 22 22 2 22 12 2"></polygon><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> قول بس لا تقول</div>
+                        <div class="card-icon" style="color: #ff007f;">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 4.5rem; height: 4.5rem;"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1M12 19v4M8 23h8"></svg>
+                        </div>
+                        <h2 class="card-title">قول بس لا تقول (تابو)</h2>
+                        <p class="card-desc">اشرح الكلمة لفريقك بدون ذكر الكلمات المحظورة الممنوعة على الشاشة قبل انتهاء الوقت!</p>
+                        <button class="btn btn-primary card-btn" style="background: linear-gradient(135deg, #ff007f, #b50055); box-shadow: 0 8px 25px rgba(255, 0, 127, 0.4);">ابدأ اللعب <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
+                    </div>
+
+                    <!-- Game 4: Charades -->
+                    <div class="game-card" onclick="partyGames.initGame('charades')">
+                        <div class="card-badge highlight"><svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> بدون كلام</div>
+                        <div class="card-icon" style="color: #ffbe0b;">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 4.5rem; height: 4.5rem;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"></svg>
+                        </div>
+                        <h2 class="card-title">لعبة بدون كلام (تمثيل)</h2>
+                        <p class="card-desc">احفظ الجملة السرية، مثلها بالجسد فقط دون نطق أي حرف، ودع عائلتك تكتشفها في 60 ثانية!</p>
+                        <button class="btn btn-secondary card-btn" style="background: linear-gradient(135deg, #ffbe0b, #cc9600); box-shadow: 0 8px 25px rgba(255, 190, 11, 0.4); color: #1e1e10;">ابدأ اللعب <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
+                    </div>
+
+                    <!-- Game 5: Word Scramble -->
+                    <div class="game-card" onclick="partyGames.initGame('scramble')">
+                        <div class="card-badge"><svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line></svg> ذكاء وسرعة</div>
+                        <div class="card-icon" style="color: #3a86c8;">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 4.5rem; height: 4.5rem;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3.5A2.5 2.5 0 0 1 6.5 1H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"></svg>
+                        </div>
+                        <h2 class="card-title">تحدي الكلمات المبعثرة</h2>
+                        <p class="card-desc">تظهر الكلمة مبعثرة الحروف على الشاشة، تسابقوا لجمع الأحرف ومعرفة الكلمة الأصلية!</p>
+                        <button class="btn btn-primary card-btn" style="background: linear-gradient(135deg, #3a86c8, #1d5280); box-shadow: 0 8px 25px rgba(58, 134, 200, 0.4);">ابدأ اللعب <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 2: Quiz Setup Screen -->
+            <section id="quiz-setup-screen" class="app-screen">
+                <div class="setup-container">
+                    <h2 class="screen-title">
+                        <svg class="icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="2" y1="14" x2="6" y2="14"></line><line x1="10" y1="8" x2="14" y2="8"></line><line x1="18" y1="16" x2="22" y2="16"></line></svg>
+                        <span>إعداد مسابقة الأسئلة</span>
+                    </h2>
+                    
+                    <div class="setup-section">
+                        <h3>اختر نوع الأسئلة (التصنيف):</h3>
+                        <div class="category-grid">
+                            <div class="category-item active" data-category="mix">
+                                <svg class="icon" viewBox="0 0 24 24"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+                                <span>خلطة عشوائية</span>
+                            </div>
+                            <div class="category-item" data-category="history">
+                                <svg class="icon" viewBox="0 0 24 24"><line x1="2" y1="22" x2="22" y2="22"></line><line x1="18" y1="13" x2="18" y2="22"></line><line x1="6" y1="13" x2="6" y2="22"></line><line x1="14" y1="13" x2="14" y2="22"></line><line x1="10" y1="13" x2="10" y2="22"></line><path d="M12 2L2 7h20L12 2z"></path><path d="M4 10h16v3H4z"></path></svg>
+                                <span>تاريخية</span>
+                            </div>
+                            <div class="category-item" data-category="sports">
+                                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10zM2 12h20"></svg>
+                                <span>رياضة</span>
+                            </div>
+                            <div class="category-item" data-category="entertainment">
+                                <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="2" ry="2"></rect><line x1="7" y1="2" x2="7" y2="22"></line><line x1="17" y1="2" x2="17" y2="22"></line><line x1="2" y1="12" x2="22" y2="12"></line><line x1="2" y1="7" x2="7" y2="7"></line><line x1="2" y1="17" x2="7" y2="17"></line><line x1="17" y1="17" x2="22" y2="17"></line><line x1="17" y1="7" x2="22" y2="7"></line></svg>
+                                <span>أفلام ومسلسلات</span>
+                            </div>
+                            <div class="category-item" data-category="religious">
+                                <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l2 4h-4l2-4zM4 14v8h16v-8l-8-6-8 6z"></path><path d="M12 8v10M9 12h6"></svg>
+                                <span>ثقافة دينية</span>
+                            </div>
+                            <div class="category-item" data-category="gaming">
+                                <svg class="icon" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="3"></rect><path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"></svg>
+                                <span>ألعاب وفيديو</span>
+                            </div>
+                            <div class="category-item" data-category="geography">
+                                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></svg>
+                                <span>دول وجغرافية</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setup-section">
+                        <h3>مصدر الأسئلة:</h3>
+                        <div class="mode-selector">
+                            <div class="mode-option active" data-source="local" onclick="quiz.setSource('local')">
+                                <svg class="icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"></path></svg>
+                                <div>
+                                    <strong>بنك الأسئلة المدمج</strong>
+                                    <span>مئات الأسئلة الممتازة والمنوعة المحفوظة مسبقاً جاهزة بدون إنترنت.</span>
+                                </div>
+                            </div>
+                            <div class="mode-option" data-source="ai" onclick="quiz.setSource('ai')">
+                                <svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"></rect><line x1="9" y1="2" x2="9" y2="4"></line><line x1="15" y1="2" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="22"></line><line x1="15" y1="20" x2="15" y2="22"></line><line x1="20" y1="9" x2="22" y2="9"></line><line x1="20" y1="15" x2="22" y2="15"></line><line x1="2" y1="9" x2="4" y2="9"></line><line x1="2" y1="15" x2="4" y2="15"></line></svg>
+                                <div>
+                                    <strong>توليد ذكي بالذكاء الاصطناعي (Gemini)</strong>
+                                    <span>توليد أسئلة فريدة وجديدة تماماً في كل مرة. يتطلب مفتاح API Key في الإعدادات.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="ai-key-warning" class="warning-alert hidden">
+                            <svg class="icon" viewBox="0 0 24 24"><polygon points="12 2 22 22 2 22 12 2"></polygon><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <span>تنبيه: لتفعيل وضع الذكاء الاصطناعي، يرجى إدخال مفتاح Gemini API Key في لوحة <a href="#" onclick="app.toggleSettingsWidget(); return false;">الإعدادات السريعة</a> أولاً. تم التحويل لبنك الأسئلة المدمج حالياً.</span>
+                        </div>
+                    </div>
+
+                    <div class="setup-actions">
+                        <button class="btn btn-back" onclick="app.showScreen('home-screen')">رجوع</button>
+                        <button class="btn btn-primary btn-large" onclick="quiz.startQuiz()">ابدأ التحدي الآن</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 3: Quiz Game Screen -->
+            <section id="quiz-game-screen" class="app-screen">
+                <div class="game-with-sidebar-container">
+                    <aside class="persistent-sidebar" id="quiz-sidebar"></aside>
+                    <div class="game-main-content">
+                        <div class="game-layout-quiz">
+                            <!-- Right/Top Panel: Question & Timer -->
+                            <div class="quiz-main-panel">
+                                <div class="quiz-meta">
+                                    <span class="quiz-category-badge" id="quiz-current-category">خلطة عشوائية</span>
+                                    <span class="quiz-score" id="quiz-question-counter">السؤال: 1 / 10</span>
+                                </div>
+                                
+                                <div class="question-container">
+                                    <h2 id="question-text">جاري تحميل السؤال الذكي...</h2>
+                                </div>
+
+                                <!-- Timer with numeric glow and a slider/bar -->
+                                <div class="timer-wrapper">
+                                    <div class="timer-bar-container">
+                                        <div id="timer-bar" class="timer-bar"></div>
+                                    </div>
+                                    <div class="timer-text-container">
+                                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        <span id="timer-seconds">30</span> ثانية
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Options Grid -->
+                            <div class="options-grid" id="options-container">
+                                <!-- Generates 4 options dynamically -->
+                            </div>
+
+                            <!-- Bottom panel controls -->
+                            <div class="game-footer-controls">
+                                <button class="btn btn-back" onclick="app.showScreen('home-screen')"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> الرئيسية</button>
+                                <button class="btn btn-secondary" id="reveal-answer-btn" onclick="quiz.revealAnswer()"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> كشف الإجابة فوراً</button>
+                                <button class="btn btn-back" onclick="app.endContest()" style="background: rgba(255, 190, 11, 0.15); border-color: #ffbe0b; color: #ffbe0b;">
+                                    <svg class="icon" viewBox="0 0 24 24" style="stroke: #ffbe0b; fill: none; width:1.2rem; height:1.2rem;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 1 6 6v5a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8a6 6 0 0 1 6-6z"></path></svg>
+                                    إنهاء السباق
+                                </button>
+                                <button class="btn btn-primary hidden" id="next-question-btn" onclick="quiz.nextQuestion()">السؤال التالي <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 4: Spot Differences Setup Screen -->
+            <section id="spot-setup-screen" class="app-screen">
+                <div class="setup-container">
+                    <h2 class="screen-title">
+                        <svg class="icon" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="2" y1="14" x2="6" y2="14"></line><line x1="10" y1="8" x2="14" y2="8"></line><line x1="18" y1="16" x2="22" y2="16"></line></svg>
+                        <span>إعداد لعبة الفروقات البصرية</span>
+                    </h2>
+
+                    <div class="setup-section">
+                        <h3>اختر نمط الرسوم التوليدية:</h3>
+                        <div class="theme-grid">
+                            <div class="theme-item active" data-theme="space">
+                                <div class="theme-preview space-preview"></div>
+                                <span>سديم الفضاء والأجرام</span>
+                            </div>
+                            <div class="theme-item" data-theme="neon">
+                                <div class="theme-preview neon-preview"></div>
+                                <span>أشكال النيون المتوهجة</span>
+                            </div>
+                            <div class="theme-item" data-theme="nature">
+                                <div class="theme-preview nature-preview"></div>
+                                <span>غابة الأشكال الطبيعية</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setup-actions">
+                        <button class="btn btn-back" onclick="app.showScreen('home-screen')">رجوع</button>
+                        <button class="btn btn-secondary btn-large" onclick="spotDiff.startGame()">ابدأ التحدي</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 5: Spot Differences Game Screen -->
+            <section id="spot-game-screen" class="app-screen">
+                <div class="game-with-sidebar-container">
+                    <aside class="persistent-sidebar" id="spot-sidebar"></aside>
+                    <div class="game-main-content">
+                        <div class="game-layout-spot">
+                            <div class="spot-header">
+                                <div class="spot-meta">
+                                    <span class="spot-badge"><svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg> كم عدد الاختلافات؟</span>
+                                    <span class="spot-counter" id="spot-progress">احسب الفروقات بين اللوحتين واختر الإجابة الصحيحة</span>
+                                </div>
+                                <!-- Centered Timer -->
+                                <div class="spot-timer">
+                                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                    <span id="spot-timer-seconds">30</span> ثانية
+                                </div>
+                            </div>
+
+                            <!-- Canvases Container (Double Screen Layout) -->
+                            <div class="canvases-container">
+                                <div class="canvas-wrapper">
+                                    <span class="canvas-label">اللوحة الأصلية (أ)</span>
+                                    <div class="canvas-relative">
+                                        <canvas id="canvas-original" width="600" height="400"></canvas>
+                                    </div>
+                                </div>
+                                <div class="canvas-wrapper">
+                                    <span class="canvas-label">اللوحة (ب)</span>
+                                    <div class="canvas-relative">
+                                        <canvas id="canvas-modified" width="600" height="400"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Multiple Choice Options for Number of Differences -->
+                            <div class="options-grid" id="spot-options-container" style="margin-top: 25px;">
+                                <!-- Generates 4 options dynamically -->
+                            </div>
+
+                            <!-- Game Status alert overlay/panel -->
+                            <div id="spot-game-result" class="spot-result-overlay hidden">
+                                <div class="result-box">
+                                    <h2 id="spot-result-title">انتهى الوقت!</h2>
+                                    <p id="spot-result-desc">عدد الفروقات الصحيح هو 5. تم تحديد الفروقات باللون الأحمر المتوهج على اللوحات.</p>
+                                    <div class="result-actions">
+                                        <button class="btn btn-secondary" onclick="spotDiff.restartGame()"><svg class="icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg> العب مجدداً</button>
+                                        <button class="btn btn-back" onclick="app.showScreen('home-screen')"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> الرئيسية</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bottom controls for standard screen -->
+                            <div class="game-footer-controls">
+                                <button class="btn btn-back" onclick="app.showScreen('home-screen')"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> الرئيسية</button>
+                                <button class="btn btn-secondary" id="spot-reveal-btn" onclick="spotDiff.revealAllDifferences()"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> كشف الإجابة فوراً</button>
+                                <button class="btn btn-back" onclick="app.endContest()" style="background: rgba(255, 190, 11, 0.15); border-color: #ffbe0b; color: #ffbe0b;">
+                                    <svg class="icon" viewBox="0 0 24 24" style="stroke: #ffbe0b; fill: none; width:1.2rem; height:1.2rem;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 1 6 6v5a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8a6 6 0 0 1 6-6z"></path></svg>
+                                    إنهاء السباق
+                                </button>
+                                <button class="btn btn-primary hidden" id="spot-next-btn" onclick="spotDiff.restartGame()">لوحة جديدة <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 6: Settings Screen -->
+            <section id="settings-screen" class="app-screen">
+                <div class="setup-container">
+                    <h2 class="screen-title">
+                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <span>إعدادات الذكاء الاصطناعي والصوت</span>
+                    </h2>
+                    
+                    <div class="settings-box">
+                        <div class="setting-item">
+                            <h3>مفتاح Gemini API Key لتوليد الأسئلة المستمر:</h3>
+                            <p class="setting-desc">نحن نستخدم الذكاء الاصطناعي لتوليد أسئلة مسلية وجديدة تماماً ومحيرة للذكاء في كل مرة تفتح فيها اللعبة. يمكنك الحصول على مفتاح مجاني وبسرعة من Google AI Studio.</p>
+                            
+                            <div class="api-key-input-container">
+                                <input type="password" id="api-key-input" placeholder="أدخل مفتاح API الخاص بك هنا (AIzaSy...)" autocomplete="off">
+                                <button class="btn btn-secondary" id="toggle-key-visibility" onclick="app.toggleKeyVisibility()">
+                                    <svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                </button>
+                            </div>
+                            
+                            <div class="api-guide-links">
+                                <a href="https://aistudio.google.com/" target="_blank" class="guide-link">
+                                    احصل على مفتاح مجاني (Google AI Studio)
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="setting-item">
+                            <h3>المؤثرات الصوتية والموسيقى التفاعلية:</h3>
+                            <p class="setting-desc">التحكم في المؤثرات الصوتية الصادرة من اللعبة (أصوات النقر، عداد الثواني، الفوز، الخسارة والإجابات الصحيحة).</p>
+                            <div class="sound-control-row">
+                                <span class="sound-status-label">الحالة الحالية: <strong id="sound-status-text" class="status-active">مفعّل</strong></span>
+                                <button class="btn btn-secondary" onclick="app.toggleSound()">تغيير الحالة</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="setup-actions">
+                        <button class="btn btn-primary btn-large" onclick="app.saveSettings()">حفظ الإعدادات</button>
+                        <button class="btn btn-back" onclick="app.showScreen('home-screen')">رجوع للرئيسية</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 7: Party Games Screen -->
+            <section id="party-game-screen" class="app-screen">
+                <div class="game-with-sidebar-container">
+                    <aside class="persistent-sidebar" id="party-sidebar"></aside>
+                    <div class="game-main-content">
+                        <div class="game-layout-quiz">
+                            <div class="quiz-main-panel">
+                                <div class="quiz-meta">
+                                    <span class="quiz-category-badge" id="party-game-title">لعبة عائلية</span>
+                                    <span class="quiz-score">تحدي الـ 60 ثانية</span>
+                                </div>
+                                
+                                <!-- Word Container (Secret Locked, Revealed, or Game Active) -->
+                                <div id="party-word-container" class="question-container" style="min-height: 220px; display: flex; justify-content: center; align-items: center;">
+                                    <!-- Rendered dynamically -->
+                                </div>
+
+                                <!-- Timer -->
+                                <div class="timer-wrapper" style="margin-top: 25px;">
+                                    <div class="timer-bar-container">
+                                        <div id="party-timer-bar" class="timer-bar" style="width: 100%;"></div>
+                                    </div>
+                                    <div class="timer-text-container">
+                                        <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                        <span id="party-timer-seconds">60</span> ثانية
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer controls for Party Games -->
+                            <div class="game-footer-controls">
+                                <button class="btn btn-back" onclick="app.showScreen('home-screen')"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> الرئيسية</button>
+                                <button class="btn btn-secondary" id="party-reveal-btn" onclick="partyGames.revealAnswer()"><svg class="icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg> كشف الكلمة ومطابقة الحل</button>
+                                <button class="btn btn-secondary" id="party-start-round-btn" onclick="partyGames.startRound()"><svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> بدء المؤقت والشرح</button>
+                                <button class="btn btn-back" onclick="app.endContest()" style="background: rgba(255, 190, 11, 0.15); border-color: #ffbe0b; color: #ffbe0b;">
+                                    <svg class="icon" viewBox="0 0 24 24" style="stroke: #ffbe0b; fill: none; width:1.2rem; height:1.2rem;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 1 6 6v5a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8a6 6 0 0 1 6-6z"></path></svg>
+                                    إنهاء السباق
+                                </button>
+                                <button class="btn btn-primary hidden" id="party-next-btn" onclick="partyGames.loadNewRound()">جولة جديدة <svg class="icon" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Screen 8: Celebration / Grand Podium Screen -->
+            <section id="celebration-screen" class="app-screen">
+                <div class="celebration-layout">
+                    <div class="triumph-banner">
+                        <h1>🏆 حفل التتويج الكبير 🏆</h1>
+                        <p id="grand-winner-name">جاري حساب النقاط وتحديد البطل...</p>
+                    </div>
+                    
+                    <!-- CSS 3D Cartoon Podium -->
+                    <div class="podium-container" id="podium-container">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <div class="setup-actions">
+                        <button class="btn btn-secondary" onclick="app.resetScores(); app.showScreen('home-screen')"><svg class="icon" viewBox="0 0 24 24"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg> تصفير النقاط واللعب مجدداً</button>
+                        <button class="btn btn-primary btn-large" onclick="app.showScreen('home-screen')"><svg class="icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg> القائمة الرئيسية</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Generic Modal: Winner Selector Popup -->
+        <div id="winner-modal" class="modal-overlay hidden">
+            <div class="modal-content-glass">
+                <h2>من الفائز في هذه الجولة؟ 🏆</h2>
+                <p>اختر اسم المتسابق الذي أحرز نقطة في هذا التحدي:</p>
+                
+                <div class="winner-players-grid" id="winner-players-grid">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <div class="modal-side-actions">
+                    <button class="btn btn-primary" onclick="app.endContest()" style="background: linear-gradient(135deg, #ffbe0b, #cc9600); border-color: #ffbe0b; color: #111;">
+                        <svg class="icon" viewBox="0 0 24 24" style="stroke: #111; fill: none; width:1.2rem; height:1.2rem;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.45 1-1 1H4v2h16v-2h-5c-.55 0-1-.45-1-1v-2.34"></path><path d="M12 2a6 6 0 0 1 6 6v5a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8a6 6 0 0 1 6-6z"></path></svg>
+                        إنهاء السباق وتتويج البطل
+                    </button>
+                    <button class="btn btn-back" onclick="app.closeWinnerSelection()">إلغاء النافذة</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sudden Death Duel Modal Overlay -->
+        <div id="duel-modal" class="modal-overlay hidden" style="background: rgba(230, 57, 70, 0.95);">
+            <div class="modal-content-glass" style="border-color: #ffbe0b; box-shadow: 0 0 50px rgba(255, 190, 11, 0.8);">
+                <h1 style="font-size: 3.5rem; font-weight: 900; color: #ffffff; text-shadow: 0 0 20px rgba(0,0,0,0.5); margin-bottom: 20px; animation: pulse 1s infinite alternate;">⚔️ مبارزة ثنائية مفاجئة! ⚔️</h1>
+                <p style="font-size: 1.5rem; color: #fff; margin-bottom: 30px;">تأهبوا للحماس! تم اختيار الخصمين عشوائياً لمبارزة سرعة خاطفة:</p>
+                
+                <div style="display: flex; justify-content: center; align-items: center; gap: 40px; margin-bottom: 40px;">
+                    <div class="duel-player" style="text-align: center;">
+                        <div id="duel-p1-avatar" style="font-size: 5rem; animation: jumpWiggle 1s infinite alternate;">🦊</div>
+                        <h3 id="duel-p1-name" style="font-size: 1.8rem; color: white; margin-top: 10px; text-shadow: 0 2px 5px black;">اللاعب الأول</h3>
+                    </div>
+                    <div style="font-size: 4rem; color: #ffbe0b; font-weight: 900; font-style: italic;">ضد</div>
+                    <div class="duel-player" style="text-align: center;">
+                        <div id="duel-p2-avatar" style="font-size: 5rem; animation: jumpWiggle 1.1s infinite alternate;">🦁</div>
+                        <h3 id="duel-p2-name" style="font-size: 1.8rem; color: white; margin-top: 10px; text-shadow: 0 2px 5px black;">اللاعب الثاني</h3>
+                    </div>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.2); padding: 15px 30px; border-radius: 15px; margin-bottom: 35px; color: #ffbe0b; font-size: 1.35rem; font-weight: bold;">
+                    ⚠️ الفائز بالتحدي القادم يحصد نقطتين مضاعفتين!
+                </div>
+
+                <button class="btn btn-secondary btn-large" onclick="app.closeDuelModal()" style="padding: 20px 50px; font-size: 1.5rem; border-radius: 20px;">بدء التحدي الناري 🔥</button>
+            </div>
+        </div>
+
+        <!-- Interactive Wheel of Chaos Modal Overlay -->
+        <div id="chaos-wheel-modal" class="modal-overlay hidden" style="background: rgba(10, 11, 16, 0.95); z-index: 1010;">
+            <div class="modal-content-glass" style="max-width: 500px; text-align: center; border-color: var(--color-secondary); box-shadow: 0 0 40px var(--color-secondary-glow);">
+                <h2 style="font-size: 2.2rem; color: #00f5d4; font-weight: 900; margin-bottom: 20px;">🎰 عجلة الفوضى والجنون 🎰</h2>
+                <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 1.1rem;">تدور العجلة الآن لتحدد مصير اللاعب بالكامل...</p>
+                
+                <div class="wheel-outer-wrapper" style="position: relative; width: 300px; height: 300px; margin: 0 auto 30px auto;">
+                    <!-- Triangle Arrow indicator -->
+                    <div class="wheel-pointer" style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 18px solid transparent; border-right: 18px solid transparent; border-top: 25px solid #ff007f; z-index: 50;"></div>
+                    <div id="chaos-wheel-spinner" class="chaos-wheel-spinner">
+                        <!-- Custom CSS Sections -->
+                        <div class="wheel-slice slice-green"><span>3 نقاط 🎉</span></div>
+                        <div class="wheel-slice slice-red"><span>خصم نقطة 📉</span></div>
+                        <div class="wheel-slice slice-blue"><span>تبادل البطاقات 🔄</span></div>
+                    </div>
+                </div>
+
+                <div id="wheel-status-msg" style="font-size: 1.4rem; font-weight: bold; min-height: 40px; color: white; margin-bottom: 20px;">
+                    انتظر دورة الحظ... 🎲
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+        <!-- Toast Notification Anchor -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Meteor Shower background elements -->
+        <div class="meteor-shower-bg">
+            <div class="meteor met-1"></div>
+            <div class="meteor met-2"></div>
+            <div class="meteor met-3"></div>
+            <div class="meteor met-4"></div>
+            <div class="meteor met-5"></div>
+        </div>
+
+        <!-- Confetti falling particle anchor -->
+        <div id="confetti-container" class="confetti-container"></div>
+        
+        <!-- Cosmic Hurricane Fullscreen Overlay -->
+        <div id="hurricane-overlay" class="hurricane-overlay hidden">
+            <div class="hurricane-cyclone"></div>
+            <div class="hurricane-content">
+                <span class="hurricane-icon">🌪️</span>
+                <h2>إعصار الفوضى الكوني يضرب اللعبة!</h2>
+                <p>انتظروا... جاري خلط وإعادة توزيع نقاط الجميع عشوائياً!</p>
+            </div>
+        </div>
+
+        <!-- TV Buzzer Flash Notification (Float Overlay) -->
+        <div id="tv-buzzer-toast" class="tv-buzzer-toast hidden">
+            <div class="buzzer-toast-content">
+                <span class="buzzer-toast-bell">🚨</span>
+                <span id="tv-buzzer-name">أحمد</span> ضغط أولاً!
+            </div>
+        </div>
+
+        <!-- Mobile Controller Screen (Loads ONLY when ?join is present) -->
+        <div id="mobile-controller-screen" class="mobile-controller-screen hidden">
+            <div class="mobile-controller-card">
+                <div class="mobile-logo">📱 تحكم الـ Buzzer اللاسلكي</div>
+                
+                <!-- Mobile Register View (Wireless Registration) -->
+                <div id="mobile-register-view">
+                    <label for="mobile-reg-name-input" style="display: block; margin-bottom: 12px; font-weight: bold; font-size: 1.1rem;">أدخل اسمك للانضمام وسحب بطاقتك السرية:</label>
+                    <input type="text" id="mobile-reg-name-input" placeholder="اكتب اسمك هنا..." maxlength="15" style="width: 100%; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.2); box-sizing: border-box; text-align: center; font-size: 1.1rem; margin-bottom: 20px; outline: none;">
+                    <button class="btn btn-primary" onclick="app.registerPlayerFromMobile()" style="width: 100%; padding: 14px; font-size: 1.1rem; font-weight: bold; background: linear-gradient(135deg, var(--color-primary), #7b2cbf);">🎮 انضمام للعب وسحب بطاقة</button>
+                </div>
+                
+                <!-- Mobile Power Card Panel (Visible once registered) -->
+                <div id="mobile-power-panel" class="hidden" style="margin-bottom: 20px; padding: 15px; background: rgba(255, 255, 255, 0.05); border-radius: 18px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 12px;">
+                        <span id="mobile-avatar" style="font-size: 2.2rem;">😎</span>
+                        <div style="text-align: right;">
+                            <div id="mobile-player-name" style="font-weight: bold; font-size: 1.1rem; color: #ffbe0b;">المتسابق</div>
+                            <div style="font-size: 0.8rem; color: #aaa;">تفعيل بطاقة القوة السرية (لمرة واحدة):</div>
+                        </div>
+                    </div>
+                    <!-- Glowing Power Button -->
+                    <button id="mobile-use-power-btn" class="mobile-power-activate-btn" onclick="app.activatePowerFromMobile()">
+                        <span id="mobile-power-icon">🛡️</span> تفعيل: <span id="mobile-power-name">درع الحماية</span>
+                    </button>
+                    <p id="mobile-power-desc" style="font-size: 0.8rem; color: #bbb; margin-top: 8px; line-height: 1.35;">هذه البطاقة تؤمن لك نقطة إضافية عند تفعيلها</p>
+                </div>
+
+                <div id="mobile-buzzer-view" class="hidden">
+                    <button id="mobile-buzzer-btn" class="mobile-buzzer-btn" onclick="app.sendMobileBuzz()">
+                        <span class="buzzer-core">BUZZ 🚨</span>
+                    </button>
+                    <p style="margin-top: 20px; font-size: 0.9rem; color: #888;">اضغط على الزر لتكون الأسرع في الإجابة على شاشة التلفاز!</p>
+                </div>
+
+                <!-- Mobile Question View (Kahoot Mode) -->
+                <div id="mobile-question-view" class="hidden">
+                    <div id="mobile-question-status" style="margin-bottom: 20px; font-weight: bold; color: #ffbe0b; font-size: 1.2rem;">اختر إجابتك بحذر!</div>
+                    <div class="mobile-options-grid">
+                        <button class="mobile-opt-btn opt-0" onclick="app.submitMobileAnswer(0)">
+                            <span class="opt-label">A 🟥</span>
+                        </button>
+                        <button class="mobile-opt-btn opt-1" onclick="app.submitMobileAnswer(1)">
+                            <span class="opt-label">B 🟦</span>
+                        </button>
+                        <button class="mobile-opt-btn opt-2" onclick="app.submitMobileAnswer(2)">
+                            <span class="opt-label">C 🟩</span>
+                        </button>
+                        <button class="mobile-opt-btn opt-3" onclick="app.submitMobileAnswer(3)">
+                            <span class="opt-label">D 🟨</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Result View -->
+                <div id="mobile-result-view" class="hidden">
+                    <div id="mobile-result-card" class="result-card" style="padding: 20px; border-radius: 15px; margin-top: 10px;">
+                        <div id="mobile-result-icon" style="font-size: 4rem; margin-bottom: 15px;">🎉</div>
+                        <h2 id="mobile-result-title" style="font-size: 1.8rem; margin-bottom: 10px;">إجابة صحيحة!</h2>
+                        <p id="mobile-result-desc" style="color: #ddd;">انتظر السؤال القادم...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <footer class="main-footer">
+            <p>سهرة العائلة © 2026 - ألعاب تلفزيونية تفاعلية راقية تعمل 100% بدون إنترنت</p>
+        </footer>
+
+        <!-- Slide-out Settings Widget Panel -->
+        <div id="settings-widget" class="settings-widget-panel closed">
+            <div class="settings-widget-header">
+                <h2>⚙️ الإعدادات السريعة</h2>
+                <button class="settings-widget-close" onclick="app.toggleSettingsWidget()">×</button>
+            </div>
+            <div class="settings-widget-body">
+                <div class="setting-widget-item" style="margin-bottom: 20px;">
+                    <label for="widget-gemini-key" style="display: block; margin-bottom: 8px; font-weight: bold; color: #ffbe0b;">مفتاح Gemini API Key لتوليد الأسئلة:</label>
+                    <input type="password" id="widget-gemini-key" placeholder="أدخل مفتاح API الخاص بك (AIzaSy...)" style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.4); color: white; box-sizing: border-box;">
+                </div>
+                <div class="setting-widget-item" style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #ffbe0b;">المؤثرات الصوتية والموسيقى:</label>
+                    <button class="btn btn-secondary" id="widget-sound-toggle-btn" onclick="app.toggleSoundFromWidget()" style="width: 100%; padding: 12px;">
+                        🔊 المؤثرات الصوتية: مفعّلة
+                    </button>
+                </div>
+                
+                <!-- QR Code Connection Widget -->
+                <div class="setting-widget-item" style="margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px; text-align: center;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold; color: var(--color-secondary);">📱 ربط الهواتف (Buzzer):</label>
+                    <div id="settings-qr-container" style="display: inline-block; background: white; padding: 10px; border-radius: 10px; margin: 8px 0;">
+                        <!-- QR Code Image will be loaded dynamically -->
+                        <span style="color: black; font-size: 0.8rem;">جاري جلب رمز الاستجابة...</span>
+                    </div>
+                    <div id="settings-room-code" style="font-size: 0.9rem; color: #aaa; margin-top: 5px; font-family: monospace;">ROOM: CONNECTING</div>
+                </div>
+
+                <button class="btn btn-primary" onclick="app.saveWidgetSettings()" style="width: 100%; padding: 12px; font-weight: bold; background: linear-gradient(135deg, var(--color-primary), #5a189a); border: none; margin-top: 10px;">
+                    💾 حفظ وحفظ التعديلات
+                </button>
+                <p class="widget-tip" style="font-size: 0.9rem; color: #aaa; text-align: center; margin-top: 20px;">💡 اضغط على حفظ لتطبيق التعديلات وإغلاق اللوحة.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modular JS loading -->
+    <script src="qrcode.min.js"></script>
+    <script src="app.js"></script>
+    <script src="quiz.js"></script>
+    <script src="spot-differences.js"></script>
+    <script src="party-games.js"></script>
+
+</body>
+</html>

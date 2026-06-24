@@ -1,0 +1,10 @@
+﻿{
+  "name": "family-tv-games",
+  "version": "1.0.0",
+  "description": "Arabic Family TV Games Hub",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}

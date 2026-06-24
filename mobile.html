@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0d0d1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>سهرة العائلة 🎮</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary:#7c3aed; --primary-light:#a78bfa;
+            --secondary:#f59e0b; --success:#10b981; --danger:#ef4444;
+            --bg:#0d0d1a; --surface:rgba(255,255,255,0.06);
+            --border:rgba(255,255,255,0.10); --text:#f1f5f9;
+            --muted:rgba(255,255,255,0.45); --radius:18px;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+        html,body{height:100%;height:100dvh;font-family:'Tajawal','Arial',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;}
+        body::before{content:'';position:fixed;inset:0;z-index:0;background:
+            radial-gradient(ellipse 80% 60% at 20% 10%,rgba(124,58,237,.18) 0%,transparent 70%),
+            radial-gradient(ellipse 60% 50% at 80% 90%,rgba(245,158,11,.12) 0%,transparent 70%);
+            pointer-events:none;}
+
+        .page{position:fixed;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:clamp(16px,4vw,32px);transition:opacity .3s,transform .3s;}
+        .page.hidden{opacity:0;pointer-events:none;transform:scale(.97);}
+
+        .card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:clamp(20px,5vw,32px);backdrop-filter:blur(24px);box-shadow:0 25px 50px rgba(0,0,0,.6);}
+
+        .logo-area{text-align:center;margin-bottom:clamp(16px,4vw,24px);}
+        .logo-emoji{font-size:clamp(2.4rem,8vw,3.8rem);display:block;}
+        .logo-title{font-size:clamp(1.5rem,5vw,2.1rem);font-weight:900;background:linear-gradient(135deg,#fff 0%,var(--primary-light) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.2;}
+        .logo-sub{font-size:clamp(.8rem,2.5vw,.95rem);color:var(--muted);margin-top:4px;}
+
+        .field-label{font-size:clamp(.85rem,2.5vw,1rem);font-weight:700;color:var(--primary-light);margin-bottom:8px;display:block;}
+        input[type="text"]{width:100%;padding:clamp(12px,3vw,16px);background:rgba(255,255,255,.07);border:1.5px solid var(--border);border-radius:12px;color:var(--text);font-size:clamp(1rem,3vw,1.2rem);font-family:'Tajawal',Arial,sans-serif;text-align:center;outline:none;margin-bottom:14px;transition:border-color .2s,box-shadow .2s;}
+        input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(124,58,237,.25);}
+        input::placeholder{color:var(--muted);}
+
+        .btn{width:100%;padding:clamp(12px,3.5vw,17px);border:none;border-radius:12px;font-family:'Tajawal',Arial,sans-serif;font-size:clamp(1rem,3vw,1.15rem);font-weight:700;cursor:pointer;transition:transform .15s,box-shadow .15s,opacity .2s;}
+        .btn:active{transform:scale(.95);}
+        .btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important;}
+        .btn-primary{background:linear-gradient(135deg,var(--primary),#9f5cf7);color:#fff;box-shadow:0 6px 24px rgba(124,58,237,.5);}
+        .btn-ready{background:linear-gradient(135deg,var(--success),#059669);color:#fff;box-shadow:0 6px 24px rgba(16,185,129,.4);margin-top:12px;}
+        .btn-power{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 6px 28px rgba(245,158,11,.5);animation:powerPulse 2.2s infinite alternate;margin-bottom:10px;}
+        .btn-power.used{background:rgba(255,255,255,.08);box-shadow:none;animation:none;color:var(--muted);cursor:not-allowed;}
+        @keyframes powerPulse{0%{box-shadow:0 6px 20px rgba(245,158,11,.35);}100%{box-shadow:0 8px 40px rgba(245,158,11,.75),0 0 16px rgba(245,158,11,.3);}}
+
+        .error-box{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.35);border-radius:10px;padding:10px 14px;font-size:clamp(.82rem,2.5vw,.9rem);color:#fca5a5;margin-bottom:14px;display:none;text-align:center;}
+
+        .player-strip{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:14px;padding:clamp(10px,3vw,14px) clamp(12px,3vw,18px);margin-bottom:clamp(14px,4vw,20px);}
+        .p-avatar{font-size:clamp(1.8rem,6vw,2.5rem);flex-shrink:0;}
+        .p-name{font-size:clamp(1rem,3.5vw,1.25rem);font-weight:700;color:var(--secondary);}
+        .p-status{font-size:clamp(.75rem,2.2vw,.85rem);color:var(--muted);margin-top:2px;}
+
+        .power-card{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(239,68,68,.08));border:1.5px solid rgba(245,158,11,.3);border-radius:16px;padding:clamp(14px,4vw,20px);margin-bottom:clamp(14px,4vw,20px);text-align:center;}
+        .power-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(245,158,11,.08) 0%,transparent 70%);animation:shimmer 3s infinite;}
+        @keyframes shimmer{0%,100%{opacity:.5;transform:scale(.9);}50%{opacity:1;transform:scale(1.1);}}
+        .pc-icon{font-size:clamp(2.2rem,7vw,3rem);display:block;margin-bottom:8px;position:relative;z-index:1;}
+        .pc-name{font-size:clamp(1rem,3.5vw,1.3rem);font-weight:900;color:var(--secondary);position:relative;z-index:1;}
+        .pc-desc{font-size:clamp(.78rem,2.3vw,.9rem);color:rgba(255,255,255,.6);line-height:1.5;margin-top:6px;position:relative;z-index:1;}
+
+        .ready-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.18);border:1px solid rgba(16,185,129,.4);border-radius:30px;padding:6px 16px;font-size:clamp(.8rem,2.4vw,.9rem);font-weight:700;color:var(--success);margin-bottom:4px;}
+
+        .waiting{display:flex;gap:8px;justify-content:center;margin:clamp(14px,4vw,22px) 0 8px;}
+        .dot{width:11px;height:11px;border-radius:50%;background:var(--primary-light);animation:bounce 1.3s infinite ease-in-out;}
+        .dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+        @keyframes bounce{0%,80%,100%{transform:scale(.55);opacity:.35;}40%{transform:scale(1);opacity:1;}}
+        .wait-label{text-align:center;font-size:clamp(.82rem,2.4vw,.92rem);color:var(--muted);}
+
+        .question-header{text-align:center;font-size:clamp(.85rem,2.5vw,1rem);color:var(--muted);margin-bottom:12px;font-weight:500;}
+        .options-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(8px,2.5vw,14px);margin-bottom:12px;}
+        .opt-btn{padding:clamp(16px,4.5vw,24px) 8px;border:none;border-radius:14px;font-family:'Tajawal',Arial,sans-serif;font-weight:700;cursor:pointer;transition:transform .15s,opacity .2s,filter .2s;display:flex;flex-direction:column;align-items:center;gap:6px;min-height:clamp(70px,16vw,100px);word-break:break-word;}
+        .opt-btn:active{transform:scale(.91);}
+        .opt-btn.selected{opacity:.35;filter:grayscale(.5);cursor:not-allowed;}
+        .opt-btn.chosen{opacity:1!important;filter:none!important;outline:3px solid #fff;outline-offset:2px;}
+        .opt-0{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;box-shadow:0 4px 20px rgba(220,38,38,.4);}
+        .opt-1{background:linear-gradient(135deg,#1d4ed8,#3b82f6);color:#fff;box-shadow:0 4px 20px rgba(29,78,216,.4);}
+        .opt-2{background:linear-gradient(135deg,#059669,#10b981);color:#fff;box-shadow:0 4px 20px rgba(5,150,105,.4);}
+        .opt-3{background:linear-gradient(135deg,#b45309,#f59e0b);color:#1a1a1a;box-shadow:0 4px 20px rgba(180,83,9,.4);}
+        .opt-letter{font-size:clamp(1.1rem,3.5vw,1.4rem);font-weight:900;}
+        .opt-text{font-size:clamp(.78rem,2.3vw,.9rem);line-height:1.3;text-align:center;}
+        .answer-status{text-align:center;font-size:clamp(.82rem,2.4vw,.92rem);color:var(--muted);min-height:20px;}
+
+        .result-card{border-radius:16px;padding:clamp(20px,5vw,28px);text-align:center;margin-bottom:14px;}
+        .result-card.correct{background:rgba(16,185,129,.13);border:1.5px solid rgba(16,185,129,.4);}
+        .result-card.wrong{background:rgba(239,68,68,.13);border:1.5px solid rgba(239,68,68,.4);}
+        .result-icon{font-size:clamp(3rem,10vw,4.5rem);margin-bottom:10px;}
+        .result-title{font-size:clamp(1.3rem,5vw,1.8rem);font-weight:900;}
+        .result-sub{font-size:clamp(.8rem,2.4vw,.9rem);color:var(--muted);margin-top:6px;}
+
+        .err-screen-icon{font-size:clamp(2.5rem,9vw,4rem);text-align:center;margin-bottom:14px;}
+        .err-screen-title{font-size:clamp(1.3rem,5vw,1.7rem);font-weight:900;text-align:center;color:#fca5a5;}
+        .err-screen-sub{font-size:clamp(.82rem,2.4vw,.9rem);color:var(--muted);text-align:center;margin:10px 0 20px;line-height:1.5;}
+
+        /* Connection status */
+        .conn-badge{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:100;background:rgba(0,0,0,.65);border:1px solid var(--border);border-radius:30px;padding:5px 14px;font-size:.78rem;color:var(--muted);backdrop-filter:blur(10px);display:flex;align-items:center;gap:6px;white-space:nowrap;}
+        .conn-dot{width:7px;height:7px;border-radius:50%;background:var(--danger);transition:background .4s;}
+        .conn-dot.ok{background:var(--success);animation:dotPulse 2s infinite;}
+        @keyframes dotPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+        @media(max-height:650px){.power-card{padding:10px 14px;margin-bottom:10px;}.pc-icon{font-size:1.8rem;margin-bottom:4px;}.logo-area{margin-bottom:10px;}.logo-emoji{font-size:2rem;}.card{padding:16px;}}
+        @media(orientation:landscape) and (max-height:500px){.options-grid{grid-template-columns:repeat(4,1fr);}.opt-btn{min-height:55px;padding:10px 6px;}.power-card{display:none;}}
+    </style>
+</head>
+<body>
+
+<div class="conn-badge" id="conn-badge">
+    <div class="conn-dot" id="conn-dot"></div>
+    <span id="conn-label">جارٍ الاتصال…</span>
+</div>
+
+<!-- SCREEN 1: Register -->
+<div id="s-register" class="page">
+    <div class="card">
+        <div class="logo-area">
+            <span class="logo-emoji">🎮</span>
+            <div class="logo-title">سهرة العائلة</div>
+            <div class="logo-sub">سجّل اسمك للانضمام</div>
+        </div>
+        <div id="err-box" class="error-box"></div>
+        <label class="field-label" for="name-in">اسمك في اللعبة</label>
+        <input type="text" id="name-in" placeholder="اكتب اسمك هنا…" maxlength="15" autocomplete="off" autocorrect="off">
+        <button class="btn btn-primary" id="join-btn" onclick="joinGame()">🎯 انضمام للعب</button>
+    </div>
+</div>
+
+<!-- SCREEN 2: Power Card -->
+<div id="s-power" class="page hidden">
+    <div class="card">
+        <div class="player-strip">
+            <div class="p-avatar" id="p2-av">😎</div>
+            <div>
+                <div class="p-name" id="p2-nm">اسمك</div>
+                <div class="p-status">✅ تم التسجيل بنجاح!</div>
+            </div>
+        </div>
+        <div class="power-card">
+            <span class="pc-icon" id="pc-icon">⚡</span>
+            <div class="pc-name" id="pc-name">بطاقة قوة</div>
+            <div class="pc-desc" id="pc-desc">وصف البطاقة</div>
+        </div>
+        <button class="btn btn-ready" onclick="markReady()">✅ أنا مستعد!</button>
+    </div>
+</div>
+
+<!-- SCREEN 3: Waiting -->
+<div id="s-waiting" class="page hidden">
+    <div class="card">
+        <div class="player-strip">
+            <div class="p-avatar" id="p3-av">😎</div>
+            <div>
+                <div class="p-name" id="p3-nm">اسمك</div>
+                <span class="ready-badge">✅ مستعد!</span>
+            </div>
+        </div>
+        <button class="btn btn-power" id="pw-btn" onclick="usePower()">
+            <span id="pw-icon">⚡</span>&nbsp;تفعيل:&nbsp;<span id="pw-name">البطاقة</span>
+        </button>
+        <div id="pw-desc" style="font-size:clamp(.78rem,2.3vw,.88rem);color:var(--muted);margin-bottom:14px;line-height:1.5;text-align:center;"></div>
+        <div class="waiting"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="wait-label">بانتظار بدء المسابقة…</div>
+    </div>
+</div>
+
+<!-- SCREEN 4: Question -->
+<div id="s-question" class="page hidden">
+    <div class="card" style="max-width:460px;">
+        <button class="btn btn-power" id="pq-btn" onclick="usePower()" style="margin-bottom:14px;">
+            <span id="pq-icon">⚡</span>&nbsp;تفعيل:&nbsp;<span id="pq-name">البطاقة</span>
+        </button>
+        <div class="question-header">اقرأ السؤال واختر إجابتك 👇</div>
+        <div id="q-text-mobile" style="font-size: 1.15rem; font-weight: bold; margin-bottom: 20px; text-align: center; color: var(--color-primary); line-height: 1.4;"></div>
+
+        <div class="options-grid">
+            <button class="opt-btn opt-0" id="opt-0" onclick="sendAnswer(0)"><span class="opt-letter">A</span><span class="opt-text" id="ot-0">🟥</span></button>
+            <button class="opt-btn opt-1" id="opt-1" onclick="sendAnswer(1)"><span class="opt-letter">B</span><span class="opt-text" id="ot-1">🟦</span></button>
+            <button class="opt-btn opt-2" id="opt-2" onclick="sendAnswer(2)"><span class="opt-letter">C</span><span class="opt-text" id="ot-2">🟩</span></button>
+            <button class="opt-btn opt-3" id="opt-3" onclick="sendAnswer(3)"><span class="opt-letter">D</span><span class="opt-text" id="ot-3">🟨</span></button>
+        </div>
+        <div class="answer-status" id="ans-status"></div>
+    </div>
+</div>
+
+<!-- SCREEN 5: Result -->
+<div id="s-result" class="page hidden">
+    <div class="card">
+        <div class="result-card" id="res-card">
+            <div class="result-icon" id="res-icon">🎉</div>
+            <div class="result-title" id="res-title">إجابة صحيحة!</div>
+            <div class="result-sub" id="res-sub">انتظر السؤال القادم…</div>
+        </div>
+        <button class="btn btn-power" id="pr-btn" onclick="usePower()">
+            <span id="pr-icon">⚡</span>&nbsp;تفعيل:&nbsp;<span id="pr-name">البطاقة</span>
+        </button>
+    </div>
+</div>
+
+<!-- SCREEN 6: Error -->
+<div id="s-error" class="page hidden">
+    <div class="card">
+        <div class="err-screen-icon" id="err-ico">⚠️</div>
+        <div class="err-screen-title" id="err-title">مشكلة في الاتصال</div>
+        <div class="err-screen-sub" id="err-detail">تأكد أن جوالك متصل بنفس شبكة الـ WiFi ثم أعِد المحاولة.</div>
+        <button class="btn btn-primary" onclick="location.reload()">🔄 إعادة المحاولة</button>
+    </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   State
+══════════════════════════════════════════ */
+let playerName='', playerAvatar='', powerCard=null, powerUsed=false, answered=false;
+let pollTimer=null, retryCount=0;
+const MAX_RETRIES=5;
+
+const params = new URLSearchParams(location.search);
+const roomId = params.get('join')||'';
+const BASE    = location.origin;   // e.g. http://192.168.0.107:8080
+
+/* ══════════════════════════════════════════
+   Init
+══════════════════════════════════════════ */
+if (!roomId) {
+    show('s-error');
+    $('err-detail').textContent='رابط غير صالح — امسح الـ QR Code من الشاشة الرئيسية مجدداً.';
+} else {
+    checkServer();
+}
+
+/* ══════════════════════════════════════════
+   Check server reachability first
+══════════════════════════════════════════ */
+async function checkServer() {
+    try {
+        const r = await fetch(`${BASE}/api/local-ip`, {signal: AbortSignal.timeout(5000)});
+        if (r.ok) {
+            setConn(true,'متصل بالخادم ✓');
+        } else { throw new Error(); }
+    } catch(e) {
+        setConn(false,'لا يمكن الوصول للخادم');
+        show('s-error');
+        $('err-detail').textContent=`تعذّر الاتصال بالخادم على ${BASE}\n\nتأكد أن:\n• جوالك متصل بنفس الـ WiFi\n• السيرفر يعمل على الكمبيوتر`;
+    }
+}
+
+/* ══════════════════════════════════════════
+   API helpers
+══════════════════════════════════════════ */
+async function api(path, body=null) {
+    const opts = body
+        ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:AbortSignal.timeout(8000) }
+        : { signal:AbortSignal.timeout(8000) };
+    const r = await fetch(`${BASE}${path}`, opts);
+    return r.json();
+}
+
+/* ══════════════════════════════════════════
+   Actions
+══════════════════════════════════════════ */
+async function joinGame() {
+    const name = $('name-in').value.trim();
+    if (!name) { showErr('يرجى إدخال اسمك أولاً!'); return; }
+    $('err-box').style.display='none';
+    $('join-btn').disabled=true;
+    $('join-btn').textContent='⏳ جارٍ الانضمام…';
+    try {
+        const res = await api('/api/room/join', { roomId, name });
+        if (res.ok) {
+            playerName   = res.name;
+            playerAvatar = res.avatar;
+            powerCard    = res.powerCard;
+            $('p2-av').textContent = res.avatar;
+            $('p2-nm').textContent = res.name;
+            $('pc-icon').textContent = res.powerCard.icon;
+            $('pc-name').textContent = res.powerCard.name;
+            $('pc-desc').textContent = res.powerCard.desc;
+            show('s-power');
+            startPolling();
+        } else {
+            showErr(res.error || 'فشل الانضمام — حاول مجدداً');
+            $('join-btn').disabled=false;
+            $('join-btn').textContent='🎯 انضمام للعب';
+        }
+    } catch(e) {
+        showErr('تعذّر الاتصال بالخادم — تأكد من اتصال الـ WiFi');
+        $('join-btn').disabled=false;
+        $('join-btn').textContent='🎯 انضمام للعب';
+    }
+}
+
+async function markReady() {
+    $('p3-av').textContent = playerAvatar;
+    $('p3-nm').textContent = playerName;
+    $('pw-icon').textContent = powerCard?.icon||'⚡';
+    $('pw-name').textContent = powerCard?.name||'البطاقة';
+    $('pw-desc').textContent = powerCard?.desc||'';
+    syncPowerBtns();
+    show('s-waiting');
+    try { await api('/api/room/ready', { roomId, name:playerName }); } catch(e){}
+}
+
+async function usePower() {
+    if (powerUsed||!powerCard) return;
+    powerUsed=true; syncPowerBtns();
+    try { await api('/api/room/power', { roomId, name:playerName }); } catch(e){}
+}
+
+async function sendAnswer(idx) {
+    if (answered) return;
+    answered=true;
+    for(let i=0;i<4;i++){const b=$(`opt-${i}`);b.disabled=true;b.classList.add(i===idx?'chosen':'selected');}
+    $('ans-status').textContent='✅ تم إرسال إجابتك — انتظر البقية…';
+    try { await api('/api/room/answer', { roomId, name:playerName, answerIndex:idx }); } catch(e){}
+}
+
+/* ══════════════════════════════════════════
+   Polling loop (asks server for events)
+══════════════════════════════════════════ */
+function startPolling() {
+    if (pollTimer) return;
+    pollTimer = setInterval(poll, 1200);
+}
+
+async function poll() {
+    try {
+        const res = await fetch(`${BASE}/api/room/mobile-poll?room=${encodeURIComponent(roomId)}&name=${encodeURIComponent(playerName)}`, {signal:AbortSignal.timeout(5000)});
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (!data.ok) {
+            if (data.error==='room_not_found') { showFatalError('انتهت المسابقة أو انقطع الاتصال.'); }
+            return;
+        }
+        retryCount=0;
+        setConn(true,'متصل ✓');
+        (data.events||[]).forEach(handleEvent);
+    } catch(e) {
+        retryCount++;
+        setConn(false, `محاولة إعادة الاتصال (${retryCount}/${MAX_RETRIES})…`);
+        if (retryCount >= MAX_RETRIES) showFatalError('انقطع الاتصال بالخادم.');
+    }
+}
+
+/* ══════════════════════════════════════════
+   Event handler (messages from server)
+══════════════════════════════════════════ */
+function handleEvent(msg) {
+    if (msg.type==='question' || msg.type==='question-start') {
+        answered=false;
+        document.body.style.backgroundColor = ''; // Reset flash
+        const labels=['🟥','🟦','🟩','🟨'];
+        const qText = document.getElementById('q-text-mobile');
+        if (qText) qText.textContent = msg.question || '';
+        for(let i=0;i<4;i++){
+            const b=$(`opt-${i}`); b.disabled=false; b.classList.remove('selected','chosen','correct','wrong'); b.style.opacity='';
+            $(`ot-${i}`).textContent=(msg.options&&msg.options[i])?msg.options[i]:labels[i];
+        }
+        $('ans-status').textContent='';
+        syncPowerBtns();
+        show('s-question');
+    }
+    else if (msg.type==='answer-reveal'||msg.type==='show-answer'||msg.type==='quiz-result') {
+        const ok = (msg.results && msg.results[playerName] !== undefined) ? msg.results[playerName] : msg.correct;
+        document.body.style.transition = 'background-color 0.3s';
+        document.body.style.backgroundColor = ok ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
+        setTimeout(() => { document.body.style.backgroundColor = ''; }, 3000);
+
+        $('res-card').className='result-card '+(ok?'correct':'wrong');
+        $('res-icon').textContent = ok?'🎉':'😞';
+        $('res-title').textContent= ok?'إجابة صحيحة! 🔥':'إجابة خاطئة!';
+        
+        let subText = 'تم تحديث نقاطك على الشاشة... انتظر السؤال القادم';
+        if (!ok && msg.correctOptionText) {
+            subText = `الإجابة الصحيحة كانت:\n[ ${msg.correctOptionText} ]\n\nانتظر السؤال القادم...`;
+        }
+        $('res-sub').innerText  = subText;
+        
+        syncPowerBtns(); show('s-result');
+    }
+    else if (msg.type==='power-used') { powerUsed=true; syncPowerBtns(); }
+    else if (msg.type==='show-buzzer') { syncPowerBtns(); show('s-waiting'); }
+    else if (msg.type==='game-over') { showFatalError('🏆 انتهت المسابقة! شكراً على مشاركتك 🎊','🏆','انتهت اللعبة!'); }
+}
+
+/* ══════════════════════════════════════════
+   Helpers
+══════════════════════════════════════════ */
+function syncPowerBtns() {
+    ['pw-btn','pq-btn','pr-btn'].forEach(bid=>{
+        const btn=$(bid); if(!btn) return;
+        if(powerUsed){btn.className='btn btn-power used';btn.innerHTML='💨 تم استخدام البطاقة';btn.disabled=true;}
+        else if(powerCard){
+            btn.className='btn btn-power'; btn.disabled=false;
+            const pfx=bid.replace('-btn','');
+            const ic=$(pfx+'-icon'), nm=$(pfx+'-name');
+            if(ic) ic.textContent=powerCard.icon;
+            if(nm) nm.textContent=powerCard.name;
+        }
+    });
+}
+function showErr(msg){const e=$('err-box');e.textContent=msg;e.style.display='block';}
+function showFatalError(detail='',ico='⚠️',title='انقطع الاتصال'){
+    clearInterval(pollTimer); pollTimer=null;
+    $('err-ico').textContent=ico; $('err-title').textContent=title; $('err-detail').textContent=detail;
+    show('s-error');
+}
+function show(pid){document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));$(pid).classList.remove('hidden');}
+function setConn(ok,label){$('conn-dot').className='conn-dot'+(ok?' ok':'');$('conn-label').textContent=label;}
+function $(x){return document.getElementById(x);}
+$('name-in').addEventListener('keypress',e=>{if(e.key==='Enter')joinGame();});
+</script>
+</body>
+</html>
