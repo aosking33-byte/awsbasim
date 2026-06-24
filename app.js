@@ -1779,7 +1779,9 @@ const app = {
         if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
         if (baseUrl.endsWith('index.html')) baseUrl = baseUrl.replace('/index.html', '');
         
-        const joinUrl = `${baseUrl}/mobile.html?join=${roomId}`;
+        // Add a timestamp parameter to force phones to bypass old cached files
+        const cacheBuster = Math.floor(Date.now() / 10000);
+        const joinUrl = `${baseUrl}/mobile.html?join=${roomId}&v=${cacheBuster}`;
         const serverHost = window.location.host;
 
         console.log('📱 Join URL:', joinUrl);

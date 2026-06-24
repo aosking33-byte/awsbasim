@@ -317,30 +317,7 @@ function sendAnswer(idx) {
     peerConn.send({ type: 'answer', name: playerName, answerIndex: idx });
 }
 
-══════════════════════════════════════════ */
-function startPolling() {
-    if (pollTimer) return;
-    pollTimer = setInterval(poll, 1200);
-}
 
-async function poll() {
-    try {
-        const res = await fetch(`${BASE}/api/room/mobile-poll?room=${encodeURIComponent(roomId)}&name=${encodeURIComponent(playerName)}`, {signal:AbortSignal.timeout(5000)});
-        if (!res.ok) throw new Error();
-        const data = await res.json();
-        if (!data.ok) {
-            if (data.error==='room_not_found') { showFatalError('انتهت المسابقة أو انقطع الاتصال.'); }
-            return;
-        }
-        retryCount=0;
-        setConn(true,'متصل ✓');
-        (data.events||[]).forEach(handleEvent);
-    } catch(e) {
-        retryCount++;
-        setConn(false, `محاولة إعادة الاتصال (${retryCount}/${MAX_RETRIES})…`);
-        if (retryCount >= MAX_RETRIES) showFatalError('انقطع الاتصال بالخادم.');
-    }
-}
 
 /* ══════════════════════════════════════════
    Event handler (messages from server)
@@ -428,3 +405,4 @@ $('name-in').addEventListener('keypress',e=>{if(e.key==='Enter')joinGame();});
 </script>
 </body>
 </html>
+
