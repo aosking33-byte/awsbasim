@@ -138,14 +138,26 @@
 
                     <!-- Game 5: Word Scramble -->
                     <div class="game-card" onclick="partyGames.initGame('scramble')">
-                        <div class="card-badge"><svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line></svg> ذكاء وسرعة</div>
+                        <div class="card-badge"><svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line></svg> حرب الحروف</div>
                         <div class="card-icon" style="color: #3a86c8;">
                             <svg class="icon" viewBox="0 0 24 24" style="width: 4.5rem; height: 4.5rem;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5V3.5A2.5 2.5 0 0 1 6.5 1H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5z"></svg>
                         </div>
-                        <h2 class="card-title">تحدي الكلمات المبعثرة</h2>
-                        <p class="card-desc">تظهر الكلمة مبعثرة الحروف على الشاشة، تسابقوا لجمع الأحرف ومعرفة الكلمة الأصلية!</p>
-                        <button class="btn btn-primary card-btn" style="background: linear-gradient(135deg, #3a86c8, #1d5280); box-shadow: 0 8px 25px rgba(58, 134, 200, 0.4);">ابدأ اللعب <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
+                        <h2 class="card-title">حرب الحروف المبعثرة</h2>
+                        <p class="card-desc">حاول ترتيب الحروف لتكوين الكلمة الصحيحة بأسرع وقت. التفكير السريع هو مفتاح الفوز!</p>
+                        <button class="btn btn-primary card-btn" style="background: linear-gradient(135deg, #3a86c8, #1d5280); box-shadow: 0 8px 25px rgba(58, 134, 200, 0.4);">العب الآن <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
                     </div>
+
+                    <!-- Game 6: True / False -->
+                    <div class="game-card" onclick="trueFalseGame.setupSettings()">
+                        <div class="card-badge highlight"><svg class="icon" viewBox="0 0 24 24" style="width: 1.1rem; height: 1.1rem;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> صح وخطأ</div>
+                        <div class="card-icon" style="color: #10b981;">
+                            <svg class="icon" viewBox="0 0 24 24" style="width: 4.5rem; height: 4.5rem;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        </div>
+                        <h2 class="card-title">تحدي الصح والخطأ 🚦</h2>
+                        <p class="card-desc">أسرع لعبة قرارات! هل المعلومة صحيحة أم خاطئة؟ احذر الفخاخ وأجب بسرعة البرق!</p>
+                        <button class="btn btn-primary card-btn" style="background: linear-gradient(135deg, #10b981, #059669); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);">العب الآن <svg class="icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg></button>
+                    </div>
+
                 </div>
             </section>
 
@@ -697,6 +709,7 @@
     <script src="quiz.js"></script>
     <script src="spot-differences.js"></script>
     <script src="party-games.js"></script>
+    <script src="true-false.js"></script>
 
 </body>
 </html>

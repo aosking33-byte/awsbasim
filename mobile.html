@@ -375,6 +375,24 @@ function handleEvent(msg) {
         for(let i=0;i<4;i++){
             const b=$(`opt-${i}`); b.disabled=false; b.classList.remove('selected','chosen','correct','wrong'); b.style.opacity='';
             $(`ot-${i}`).textContent=(msg.options&&msg.options[i])?msg.options[i]:labels[i];
+            
+            // True/False mode dynamic UI
+            if (msg.gameMode === 'true-false') {
+                if (i > 1) {
+                    b.style.display = 'none';
+                } else {
+                    b.style.display = 'flex';
+                    b.style.gridColumn = 'span 2';
+                    b.style.padding = '20px';
+                    b.querySelector('.opt-letter').style.display = 'none'; // Hide A/B letter
+                }
+            } else {
+                b.style.display = 'flex';
+                b.style.gridColumn = '';
+                b.style.padding = '';
+                const letter = b.querySelector('.opt-letter');
+                if (letter) letter.style.display = '';
+            }
         }
         $('ans-status').textContent='';
         syncPowerBtns();
