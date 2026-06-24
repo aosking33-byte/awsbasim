@@ -246,7 +246,7 @@ const trueFalseGame = {
         
         // Infinite AI mode: fetch more questions when running low!
         if (this.source === 'ai' && this.currentQuestionIndex >= this.questions.length - 2) {
-            document.getElementById('question-counter').innerText = `جاري توليد أسئلة جديدة...`;
+            document.getElementById('quiz-question-counter').innerText = `جاري توليد أسئلة جديدة...`;
             try {
                 const moreQ = await this.generateQuestionsFromAI();
                 this.questions.push(...moreQ);
@@ -292,7 +292,7 @@ const trueFalseGame = {
             app.updateSidebarUI();
 
             const limitText = this.source === 'ai' ? 'لانهائي' : this.questions.length;
-            document.getElementById('question-counter').innerText = `السؤال ${this.currentQuestionIndex + 1} / ${limitText} (صح وخطأ)`;
+            document.getElementById('quiz-question-counter').innerText = `السؤال ${this.currentQuestionIndex + 1} / ${limitText} (صح وخطأ)`;
             document.getElementById('question-text').innerText = this.currentQuestion.question;
             document.getElementById('options-container').innerHTML = ''; // Options on phone
             
