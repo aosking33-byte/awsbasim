@@ -2,6 +2,25 @@
    Arabic Family TV Games Hub - Core Application Manager
 ========================================== */
 
+const POWER_CARDS = [
+    { icon:'⚡', name:'صاعقة المضاعفة',  desc:'تضاعف نقاطك في هذا السؤال ×2 عند التفعيل' },
+    { icon:'🛡️', name:'درع الحماية',      desc:'تحمي نقاطك من الخسارة مرة واحدة' },
+    { icon:'🔥', name:'النار المقدسة',    desc:'تعطي فرصة ثانية للإجابة إذا أخطأت' },
+    { icon:'🌪️', name:'العاصفة',          desc:'تخصم 5 نقاط من المنافس الأقوى' },
+    { icon:'💎', name:'الجوهرة',           desc:'تعطيك 10 نقاط مجانية فوراً عند التفعيل' },
+    { icon:'🎯', name:'الدقة المطلقة',    desc:'إذا أجبت صح تحصل على ضعف النقاط' },
+    { icon:'🌙', name:'ليلة القدر',       desc:'تجمّد نقاط جميع المنافسين لجولة واحدة' },
+    { icon:'🚀', name:'الصاروخ',          desc:'ترفع نقاطك 15 نقطة فورية عند التفعيل' },
+];
+const AVATARS = ['😎','🤠','🥳','🤓','🤖','👾','👑','🧙','🥷','🦸'];
+
+function getRandPowerCard() { return POWER_CARDS[Math.floor(Math.random()*POWER_CARDS.length)]; }
+function getRandAvatar(used) {
+    const avail = AVATARS.filter(a=>!used.includes(a));
+    const pool  = avail.length ? avail : AVATARS;
+    return pool[Math.floor(Math.random()*pool.length)];
+}
+
 const app = {
     settings: {
         soundEnabled: true,
@@ -11,6 +30,7 @@ const app = {
     musicInterval: null,
     musicStep: 0,
     players: [],
+    mobileConnections: {}, // Store active P2P connections
     activeWinnerCallback: null,
     confettiInterval: null,
     
@@ -300,6 +320,18 @@ const app = {
         });
 
         return bestElem;
+    },
+
+    broadcast(evt) {
+        if (!this.currentRoomId) return;
+        
+        // Broadcast over WebRTC to all connected mobiles
+        for (const playerIndex in this.mobileConnections) {
+            const conn = this.mobileConnections[playerIndex];
+            if (conn && conn.open) {
+                conn.send(evt);
+            }
+        }
     },
 
     // SPA Navigation
@@ -1550,17 +1582,6 @@ const app = {
     currentRoundAnswers: {},
     currentCorrectAnswerIndex: null,
 
-    broadcast(msg) {
-        // Send via HTTP to server which queues it for all mobile clients
-        if (!this.currentRoomId) return;
-        fetch('/api/room/broadcast', {
-            method: 'POST',
-            headers: {'Content-Type':'application/json'},
-            body: JSON.stringify({ roomId: this.currentRoomId, event: msg })
-        }).catch(()=>{});
-    },
-
-
     startMobileController() {
         const appContainer = document.getElementById('app-container');
         if (appContainer) appContainer.style.display = 'none';
@@ -1753,8 +1774,12 @@ const app = {
         const roomId = 'fam-' + Math.floor(100000 + Math.random() * 900000);
         this.currentRoomId = roomId;
 
-        // ── Make the URL dynamic for any network/cloud hosting ──
-        const joinUrl = `${window.location.origin}/mobile.html?join=${roomId}`;
+        // ── Make the URL dynamic and support GitHub Pages paths ──
+        let baseUrl = window.location.href.split('?')[0];
+        if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+        if (baseUrl.endsWith('index.html')) baseUrl = baseUrl.replace('/index.html', '');
+        
+        const joinUrl = `${baseUrl}/mobile.html?join=${roomId}`;
         const serverHost = window.location.host;
 
         console.log('📱 Join URL:', joinUrl);
@@ -1766,20 +1791,92 @@ const app = {
         const rcd = document.getElementById('settings-room-code');
         if (rcd) rcd.innerText = `ROOM: ${roomId.substring(4).toUpperCase()}`;
 
-        // ── Register room with server ──
-        try {
-            await fetch(`/api/room/create?room=${encodeURIComponent(roomId)}`, {
-                signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined
-            });
-        } catch(e) { console.warn('Room register failed:', e); }
+        // ── Initialize WebRTC Host (PeerJS) ──
+        this.peer = new Peer(roomId);
 
-        // ── Start polling ──
-        if (this._tvPollTimer) clearInterval(this._tvPollTimer);
-        this._tvPollTimer = setInterval(() => this._tvPoll(), 1000);
-        console.log('✅ Room ready:', roomId, '| URL:', joinUrl);
+        this.peer.on('open', (id) => {
+            console.log('✅ WebRTC Room ready:', id, '| URL:', joinUrl);
+        });
+
+        this.peer.on('connection', (conn) => {
+            console.log('📱 Mobile connecting...', conn.peer);
+            
+            conn.on('data', (data) => {
+                this.handleMobileData(conn, data);
+            });
+        });
+
+        this.peer.on('error', (err) => {
+            console.error('PeerJS Error:', err);
+        });
     },
 
+    handleMobileData(conn, msg) {
+        if (msg.type === 'join') {
+            const cleanName = msg.name.trim().substring(0, 15);
+            // Check if name exists
+            if (this.players.some(p => p.name === cleanName)) {
+                conn.send({ type: 'join-failed', error: 'الاسم مستخدم!' });
+                return;
+            }
 
+            const avatar = getRandAvatar(this.players.map(p => p.avatar));
+            const powerCard = getRandPowerCard();
+
+            const newIdx = this.addPlayer(cleanName);
+            if (newIdx !== -1) {
+                this.players[newIdx].avatar = avatar;
+                this.players[newIdx].powerCard = powerCard;
+                
+                // Save connection object mapped to player index
+                this.mobileConnections[newIdx] = conn;
+
+                // Send success back directly to the joining mobile
+                conn.send({ type: 'join-success', name: cleanName, avatar, powerCard });
+
+                // Notify TV UI
+                this.showToast(`📱 ${avatar} ${cleanName} انضم! (${this.players.length} لاعبين)`, 'success');
+                this.updateSidebarUI();
+                
+                // Broadcast to everyone that someone joined
+                this.broadcast({ type: 'player-joined', name: cleanName, avatar, powerCard, totalPlayers: this.players.length });
+            }
+        }
+        else if (msg.type === 'ready') {
+            const rIdx = this.players.findIndex(p => p.name === msg.name);
+            if (rIdx !== -1) { 
+                this.players[rIdx].ready = true; 
+                this.updateSidebarUI(); 
+                this.broadcast({ type: 'player-ready', name: msg.name });
+            }
+            this.showToast(`✅ ${msg.name} مستعد!`, 'success');
+        }
+        else if (msg.type === 'used-power') {
+            const pi = this.players.findIndex(p => p.name === msg.name);
+            if (pi !== -1) { 
+                this.showToast(`⚡ ${msg.name} فعّل بطاقة ${msg.powerCard.name}!`, 'info'); 
+                this.usePowerCard(pi); 
+                this.broadcast({ type: 'player-used-power', name: msg.name, powerCard: msg.powerCard });
+            }
+        }
+        else if (msg.type === 'answer') {
+            const pi = this.players.findIndex(p => p.name === msg.name);
+            if (pi !== -1) {
+                this.currentRoundAnswers[pi] = msg.answerIndex;
+                this.playSound('click');
+                this.updateSidebarUI();
+                if (Object.keys(this.currentRoundAnswers).length >= this.players.length && this.players.length > 0) {
+                    if (window.quiz) quiz.revealAnswer();
+                }
+            }
+        }
+        else if (msg.type === 'spot-diff-answer') {
+            const pi = this.players.findIndex(p => p.name === msg.name);
+            if (pi !== -1 && window.spotDifferences) {
+                spotDifferences.handleMobileAnswer(pi, msg.answerIndex);
+            }
+        }
+    },
 
     _renderQR(containerId, joinUrl, serverHost) {
         const container = document.getElementById(containerId);
