@@ -91,8 +91,12 @@ const trueFalseGame = {
 
                 <div class="setup-section" id="tf-count-section" style="${app.settings.geminiApiKey ? 'display: none;' : ''}">
                     <h3>عدد الأسئلة في الجولة:</h3>
-                    <input type="number" id="tf-count-input" class="form-input" value="15" min="5" max="100" style="width:100%; max-width: 200px; text-align: center;">
-                    <small style="display:block; margin-top:5px; color:var(--text-muted);">الحد الأقصى للبنك المحلي هو 100 سؤال في الجولة الواحدة.</small>
+                    <div class="diff-count-selector" id="tf-count-selector">
+                        <div class="diff-count-option active" data-count="15" onclick="trueFalseGame.setCount(15)">15 سؤال</div>
+                        <div class="diff-count-option" data-count="30" onclick="trueFalseGame.setCount(30)">30 سؤال</div>
+                        <div class="diff-count-option" data-count="50" onclick="trueFalseGame.setCount(50)">50 سؤال</div>
+                        <div class="diff-count-option" data-count="100" onclick="trueFalseGame.setCount(100)">100 سؤال</div>
+                    </div>
                 </div>
                 
                 <div class="setup-actions">
@@ -103,7 +107,15 @@ const trueFalseGame = {
         `;
         
         this.source = app.settings.geminiApiKey ? 'ai' : 'local';
+        this.totalQuestions = 15; // default
         app.showScreen('tf-setup-screen');
+    },
+
+    setCount(num) {
+        this.totalQuestions = num;
+        const opts = document.querySelectorAll('#tf-count-selector .diff-count-option');
+        if (opts) opts.forEach(el => el.classList.remove('active'));
+        if (event && event.currentTarget) event.currentTarget.classList.add('active');
     },
 
     setSource(src) {
@@ -125,19 +137,22 @@ const trueFalseGame = {
     },
 
     async startQuiz() {
-        if (this.source === 'local') {
-            const countInput = document.getElementById('tf-count-input');
-            this.totalQuestions = parseInt(countInput.value) || 15;
-            if (this.totalQuestions > 100) this.totalQuestions = 100;
-        } else {
-            // For AI, we just generate 20 at a time, but the game has no "Total" limit. 
-            // The user plays until they click "End Game". We'll just generate 20 for now.
+        if (this.source !== 'local') {
             this.totalQuestions = 20; 
         }
 
-        app.showScreen('loading-screen');
         this.currentQuestionIndex = 0;
         this.questions = [];
+
+        // Show loading state directly in the game screen!
+        app.showScreen('quiz-game-screen');
+        document.getElementById('quiz-question-counter').innerText = 'تحدي الصح والخطأ 🚦';
+        document.getElementById('question-text').innerText = "جاري تحميل وتجهيز الأسئلة...";
+        document.getElementById('options-container').innerHTML = '';
+        document.getElementById('reveal-answer-btn').classList.add('hidden');
+        document.getElementById('next-question-btn').classList.add('hidden');
+        const endBtnCheck = document.getElementById('tf-end-game-btn');
+        if (endBtnCheck) endBtnCheck.classList.add('hidden');
 
         if (this.source === 'ai' && app.settings.geminiApiKey) {
             try {
@@ -153,7 +168,6 @@ const trueFalseGame = {
 
         if (this.questions.length > 0) {
             this.setupGoldenQuestions();
-            app.showScreen('quiz-game-screen');
             
             // VERY IMPORTANT: Override the onclick attributes of the buttons in quiz-game-screen to call our methods!
             document.getElementById('reveal-answer-btn').setAttribute('onclick', 'trueFalseGame.revealAnswer()');
