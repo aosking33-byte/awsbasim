@@ -104,6 +104,7 @@
         @media(max-height:650px){.power-card{padding:10px 14px;margin-bottom:10px;}.pc-icon{font-size:1.8rem;margin-bottom:4px;}.logo-area{margin-bottom:10px;}.logo-emoji{font-size:2rem;}.card{padding:16px;}}
         @media(orientation:landscape) and (max-height:500px){.options-grid{grid-template-columns:repeat(4,1fr);}.opt-btn{min-height:55px;padding:10px 6px;}.power-card{display:none;}}
     </style>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 </head>
 <body>
 
@@ -213,12 +214,11 @@
    State
 ══════════════════════════════════════════ */
 let playerName='', playerAvatar='', powerCard=null, powerUsed=false, answered=false;
-let pollTimer=null, retryCount=0;
-const MAX_RETRIES=5;
+let peer = null;
+let peerConn = null;
 
 const params = new URLSearchParams(location.search);
 const roomId = params.get('join')||'';
-const BASE    = location.origin;   // e.g. http://192.168.0.107:8080
 
 /* ══════════════════════════════════════════
    Init
@@ -227,35 +227,43 @@ if (!roomId) {
     show('s-error');
     $('err-detail').textContent='رابط غير صالح — امسح الـ QR Code من الشاشة الرئيسية مجدداً.';
 } else {
-    checkServer();
+    initPeerConnection();
 }
 
-/* ══════════════════════════════════════════
-   Check server reachability first
-══════════════════════════════════════════ */
-async function checkServer() {
-    try {
-        const r = await fetch(`${BASE}/api/local-ip`, {signal: AbortSignal.timeout(5000)});
-        if (r.ok) {
-            setConn(true,'متصل بالخادم ✓');
-        } else { throw new Error(); }
-    } catch(e) {
-        setConn(false,'لا يمكن الوصول للخادم');
+function initPeerConnection() {
+    setConn(false, 'جاري الاتصال بالتلفزيون...');
+    peer = new Peer(); // Auto-assign a random ID to the mobile
+
+    peer.on('open', (id) => {
+        // Connect to TV Host
+        peerConn = peer.connect(roomId);
+
+        peerConn.on('open', () => {
+            setConn(true, 'متصل بالتلفزيون ✓');
+        });
+
+        peerConn.on('data', (data) => {
+            handleEvent(data);
+        });
+
+        peerConn.on('close', () => {
+            setConn(false, 'انقطع الاتصال بالتلفزيون');
+            showFatalError('فقدنا الاتصال بالشاشة الرئيسية.');
+        });
+        
+        peerConn.on('error', () => {
+            setConn(false, 'خطأ في الاتصال');
+            showFatalError('حدث خطأ في الاتصال بالشاشة الرئيسية.');
+        });
+    });
+
+    peer.on('error', (err) => {
+        setConn(false, 'لا يمكن الوصول للتلفزيون');
         show('s-error');
-        $('err-detail').textContent=`تعذّر الاتصال بالخادم على ${BASE}\n\nتأكد أن:\n• جوالك متصل بنفس الـ WiFi\n• السيرفر يعمل على الكمبيوتر`;
-    }
+        $('err-detail').textContent=`تعذّر الاتصال بالتلفزيون.\nتأكد أن:\n• التلفزيون يعمل وتطبيق اللعبة مفتوح أمامه.`;
+    });
 }
 
-/* ══════════════════════════════════════════
-   API helpers
-══════════════════════════════════════════ */
-async function api(path, body=null) {
-    const opts = body
-        ? { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:AbortSignal.timeout(8000) }
-        : { signal:AbortSignal.timeout(8000) };
-    const r = await fetch(`${BASE}${path}`, opts);
-    return r.json();
-}
 
 /* ══════════════════════════════════════════
    Actions
@@ -263,35 +271,17 @@ async function api(path, body=null) {
 async function joinGame() {
     const name = $('name-in').value.trim();
     if (!name) { showErr('يرجى إدخال اسمك أولاً!'); return; }
+    if (!peerConn || !peerConn.open) { showErr('غير متصل بالتلفزيون!'); return; }
+    
     $('err-box').style.display='none';
     $('join-btn').disabled=true;
     $('join-btn').textContent='⏳ جارٍ الانضمام…';
-    try {
-        const res = await api('/api/room/join', { roomId, name });
-        if (res.ok) {
-            playerName   = res.name;
-            playerAvatar = res.avatar;
-            powerCard    = res.powerCard;
-            $('p2-av').textContent = res.avatar;
-            $('p2-nm').textContent = res.name;
-            $('pc-icon').textContent = res.powerCard.icon;
-            $('pc-name').textContent = res.powerCard.name;
-            $('pc-desc').textContent = res.powerCard.desc;
-            show('s-power');
-            startPolling();
-        } else {
-            showErr(res.error || 'فشل الانضمام — حاول مجدداً');
-            $('join-btn').disabled=false;
-            $('join-btn').textContent='🎯 انضمام للعب';
-        }
-    } catch(e) {
-        showErr('تعذّر الاتصال بالخادم — تأكد من اتصال الـ WiFi');
-        $('join-btn').disabled=false;
-        $('join-btn').textContent='🎯 انضمام للعب';
-    }
+    
+    peerConn.send({ type: 'join', name: name });
+    // We will wait for 'join-success' event in handleEvent
 }
 
-async function markReady() {
+function markReady() {
     $('p3-av').textContent = playerAvatar;
     $('p3-nm').textContent = playerName;
     $('pw-icon').textContent = powerCard?.icon||'⚡';
@@ -299,25 +289,23 @@ async function markReady() {
     $('pw-desc').textContent = powerCard?.desc||'';
     syncPowerBtns();
     show('s-waiting');
-    try { await api('/api/room/ready', { roomId, name:playerName }); } catch(e){}
+    peerConn.send({ type: 'ready', name: playerName });
 }
 
-async function usePower() {
+function usePower() {
     if (powerUsed||!powerCard) return;
     powerUsed=true; syncPowerBtns();
-    try { await api('/api/room/power', { roomId, name:playerName }); } catch(e){}
+    peerConn.send({ type: 'used-power', name: playerName, powerCard: powerCard });
 }
 
-async function sendAnswer(idx) {
+function sendAnswer(idx) {
     if (answered) return;
     answered=true;
     for(let i=0;i<4;i++){const b=$(`opt-${i}`);b.disabled=true;b.classList.add(i===idx?'chosen':'selected');}
     $('ans-status').textContent='✅ تم إرسال إجابتك — انتظر البقية…';
-    try { await api('/api/room/answer', { roomId, name:playerName, answerIndex:idx }); } catch(e){}
+    peerConn.send({ type: 'answer', name: playerName, answerIndex: idx });
 }
 
-/* ══════════════════════════════════════════
-   Polling loop (asks server for events)
 ══════════════════════════════════════════ */
 function startPolling() {
     if (pollTimer) return;
@@ -347,7 +335,23 @@ async function poll() {
    Event handler (messages from server)
 ══════════════════════════════════════════ */
 function handleEvent(msg) {
-    if (msg.type==='question' || msg.type==='question-start') {
+    if (msg.type === 'join-success') {
+        playerName   = msg.name;
+        playerAvatar = msg.avatar;
+        powerCard    = msg.powerCard;
+        $('p2-av').textContent = msg.avatar;
+        $('p2-nm').textContent = msg.name;
+        $('pc-icon').textContent = msg.powerCard.icon;
+        $('pc-name').textContent = msg.powerCard.name;
+        $('pc-desc').textContent = msg.powerCard.desc;
+        show('s-power');
+    }
+    else if (msg.type === 'join-failed') {
+        showErr(msg.error || 'فشل الانضمام — حاول مجدداً');
+        $('join-btn').disabled=false;
+        $('join-btn').textContent='🎯 انضمام للعب';
+    }
+    else if (msg.type==='question' || msg.type==='question-start') {
         answered=false;
         document.body.style.backgroundColor = ''; // Reset flash
         const labels=['🟥','🟦','🟩','🟨'];
