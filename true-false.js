@@ -153,9 +153,9 @@ const trueFalseGame = {
 
         if (this.questions.length > 0) {
             this.setupGoldenQuestions();
-            app.showScreen('quiz-screen');
+            app.showScreen('quiz-game-screen');
             
-            // VERY IMPORTANT: Override the onclick attributes of the buttons in quiz-screen to call our methods!
+            // VERY IMPORTANT: Override the onclick attributes of the buttons in quiz-game-screen to call our methods!
             document.getElementById('reveal-answer-btn').setAttribute('onclick', 'trueFalseGame.revealAnswer()');
             document.getElementById('next-question-btn').setAttribute('onclick', 'trueFalseGame.nextQuestion()');
 
