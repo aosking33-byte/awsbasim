@@ -54,25 +54,40 @@ const trueFalseGame = {
     },
 
     setupSettings() {
-        app.showScreen('settings-screen');
-        const container = document.getElementById('settings-container');
-        container.innerHTML = `
-            <h2 style="margin-bottom:20px;">إعدادات لعبة الصح والخطأ 🚦</h2>
-            <div style="margin-bottom:20px;">
-                <label>مصدر الأسئلة:</label>
-                <select id="tf-source-select" class="form-input">
-                    <option value="local" ${!app.settings.geminiApiKey ? 'selected' : ''}>البنك المحلي (بدون إنترنت)</option>
-                    <option value="ai" ${app.settings.geminiApiKey ? 'selected' : ''}>الذكاء الاصطناعي (أسئلة لانهائية)</option>
-                </select>
-                <small style="display:block; margin-top:5px; color:var(--text-muted);">ملاحظة: الذكاء الاصطناعي يتطلب إضافة المفتاح في إعدادات اللعبة.</small>
+        let setupScreen = document.getElementById('tf-setup-screen');
+        if (!setupScreen) {
+            setupScreen = document.createElement('section');
+            setupScreen.id = 'tf-setup-screen';
+            setupScreen.className = 'app-screen';
+            document.body.appendChild(setupScreen);
+        }
+        
+        setupScreen.innerHTML = `
+            <div class="setup-container" style="max-width: 600px; margin: 40px auto; background: var(--bg-card); padding: 30px; border-radius: 20px; text-align: center;">
+                <h2 style="margin-bottom:20px; font-size: 2rem; color: var(--color-primary);">إعدادات الصح والخطأ 🚦</h2>
+                
+                <div style="margin-bottom:20px; text-align: right;">
+                    <label style="display:block; margin-bottom:8px; font-weight:bold;">مصدر الأسئلة:</label>
+                    <select id="tf-source-select" class="form-input" style="width: 100%; padding: 10px; font-size: 1.1rem; border-radius: 10px;">
+                        <option value="local" ${!app.settings.geminiApiKey ? 'selected' : ''}>البنك المحلي (بدون إنترنت)</option>
+                        <option value="ai" ${app.settings.geminiApiKey ? 'selected' : ''}>الذكاء الاصطناعي (أسئلة لانهائية)</option>
+                    </select>
+                    <small style="display:block; margin-top:5px; color:var(--color-warning);">ملاحظة: الذكاء الاصطناعي يتطلب إضافة المفتاح في الإعدادات الرئيسية.</small>
+                </div>
+                
+                <div style="margin-bottom:30px; text-align: right;">
+                    <label style="display:block; margin-bottom:8px; font-weight:bold;">عدد الأسئلة في الجولة:</label>
+                    <input type="number" id="tf-count-input" class="form-input" value="15" min="5" max="50" style="width: 100%; padding: 10px; font-size: 1.1rem; border-radius: 10px;">
+                </div>
+                
+                <div style="display:flex; gap: 15px; justify-content: center;">
+                    <button class="btn btn-secondary" onclick="app.showScreen('home-screen')">عودة للرئيسية</button>
+                    <button class="btn btn-primary" onclick="trueFalseGame.startQuiz()" style="background: linear-gradient(135deg, #10b981, #059669);">بدء اللعب الان! 🚀</button>
+                </div>
             </div>
-            <div style="margin-bottom:20px;">
-                <label>عدد الأسئلة في الجولة:</label>
-                <input type="number" id="tf-count-input" class="form-input" value="15" min="5" max="50">
-            </div>
-            <button class="btn btn-primary" onclick="trueFalseGame.startQuiz()">بدء اللعب الان! 🚀</button>
-            <button class="btn btn-secondary" style="margin-top:10px;" onclick="app.showScreen('home-screen')">عودة للمتعة</button>
         `;
+        
+        app.showScreen('tf-setup-screen');
     },
 
     async startQuiz() {
