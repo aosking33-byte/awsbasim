@@ -174,6 +174,12 @@
         </button>
         <div class="question-header">اقرأ السؤال واختر إجابتك 👇</div>
         <div id="q-text-mobile" style="font-size: 1.15rem; font-weight: bold; margin-bottom: 20px; text-align: center; color: var(--color-primary); line-height: 1.4;"></div>
+        
+        <div id="mobile-timer-container" style="text-align:center; margin-bottom: 15px;">
+            <div style="display:inline-block; background:rgba(0,0,0,0.05); border: 2px solid var(--color-primary); border-radius: 50px; padding: 5px 20px; font-weight: bold; font-size: 1.2rem; color: var(--color-primary);">
+                ⏳ <span id="m-timer-seconds">30</span> ثانية
+            </div>
+        </div>
 
         <div class="options-grid">
             <button class="opt-btn opt-0" id="opt-0" onclick="sendAnswer(0)"><span class="opt-letter">A</span><span class="opt-text" id="ot-0">🟥</span></button>
@@ -345,6 +351,8 @@ function handleEvent(msg) {
         const labels=['🟥','🟦','🟩','🟨'];
         const qText = document.getElementById('q-text-mobile');
         if (qText) qText.textContent = msg.question || '';
+        const mTimer = document.getElementById('m-timer-seconds');
+        if (mTimer) mTimer.textContent = '30';
         for(let i=0;i<4;i++){
             const b=$(`opt-${i}`); b.disabled=false; b.classList.remove('selected','chosen','correct','wrong'); b.style.opacity='';
             $(`ot-${i}`).textContent=(msg.options&&msg.options[i])?msg.options[i]:labels[i];
@@ -372,6 +380,14 @@ function handleEvent(msg) {
         syncPowerBtns(); show('s-result');
     }
     else if (msg.type==='power-used') { powerUsed=true; syncPowerBtns(); }
+    else if (msg.type==='timer-tick') {
+        const mTimer = document.getElementById('m-timer-seconds');
+        if (mTimer) {
+            mTimer.textContent = msg.seconds;
+            if (msg.seconds <= 10) mTimer.parentElement.style.color = 'var(--color-danger)';
+            else mTimer.parentElement.style.color = 'var(--color-primary)';
+        }
+    }
     else if (msg.type==='show-buzzer') { syncPowerBtns(); show('s-waiting'); }
     else if (msg.type==='game-over') { showFatalError('🏆 انتهت المسابقة! شكراً على مشاركتك 🎊','🏆','انتهت اللعبة!'); }
 }

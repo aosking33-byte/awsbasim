@@ -443,6 +443,12 @@ const quiz = {
             const percentage = (this.timerSeconds / 30) * 100;
             timerBar.style.width = `${percentage}%`;
         }
+
+        // Broadcast to mobile
+        app.broadcast({
+            type: 'timer-tick',
+            seconds: this.timerSeconds
+        });
     },
 
     revealAnswer(isTimeout = false) {

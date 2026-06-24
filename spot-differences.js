@@ -155,6 +155,12 @@ const spotDiff = {
                 timerText.style.color = 'var(--color-secondary)';
             }
         }
+        
+        // Broadcast to mobile
+        app.broadcast({
+            type: 'timer-tick',
+            seconds: this.timerSeconds
+        });
     },
 
     generateLevel() {
