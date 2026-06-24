@@ -14,7 +14,7 @@ const quiz = {
 
     // Local Questions Bank (Fallback or Offline Mode) - Expanded to prevent repetition
     localBank: {
-        history: [
+        history: [{ question: " ?? ??? ??????? ?? ???????\, options: [\5\, \6\, \7\, \8\], answer_index: 2 },{ question: \?? ?? ????? ????????\, options: [\?????\, \??????\, \?????\, \????\], answer_index: 0 },
             { question: "من هو القائد المسلم الذي فتح الأندلس؟", options: ["صلاح الدين الأيوبي", "طارق بن زياد", "عقبة بن نافع", "خالد بن الوليد"], answer_index: 1 },
             { question: "في أي عام سقطت الدولة العباسية على يد التتار؟", options: ["1258 م", "1453 م", "1099 م", "1302 م"], answer_index: 0 },
             { question: "من هو أول إمبراطور للامبراطورية الرومانية؟", options: ["يوليوس قيصر", "أغسطس قيصر", "نيرون", "قسطنطين"], answer_index: 1 },
