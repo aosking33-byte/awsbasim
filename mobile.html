@@ -103,6 +103,23 @@
 
         @media(max-height:650px){.power-card{padding:10px 14px;margin-bottom:10px;}.pc-icon{font-size:1.8rem;margin-bottom:4px;}.logo-area{margin-bottom:10px;}.logo-emoji{font-size:2rem;}.card{padding:16px;}}
         @media(orientation:landscape) and (max-height:500px){.options-grid{grid-template-columns:repeat(4,1fr);}.opt-btn{min-height:55px;padding:10px 6px;}.power-card{display:none;}}
+
+        /* Flame Effect */
+        .btn-flame {
+            background: linear-gradient(135deg, #ff4500, #ff8c00, #ff0000);
+            background-size: 200% 200%;
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 69, 0, 0.6);
+            animation: fire-flame 1.5s ease infinite alternate;
+            border: 2px solid #ffae42;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            margin-top: 15px;
+        }
+        @keyframes fire-flame {
+            0% { background-position: 0% 50%; box-shadow: 0 4px 15px rgba(255, 69, 0, 0.6); }
+            50% { background-position: 100% 50%; box-shadow: 0 4px 25px rgba(255, 140, 0, 0.8), inset 0 0 10px rgba(255,255,0,0.4); transform: scale(1.02); }
+            100% { background-position: 0% 50%; box-shadow: 0 4px 15px rgba(255, 69, 0, 0.6); }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
 </head>
@@ -141,9 +158,11 @@
         <div class="power-card">
             <span class="pc-icon" id="pc-icon">⚡</span>
             <div class="pc-name" id="pc-name">بطاقة قوة</div>
-            <div class="pc-desc" id="pc-desc">وصف البطاقة</div>
+            <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.2); margin: 10px 0;">
+            <div style="font-size: 0.85rem; font-weight: bold; color: var(--color-primary); margin-bottom: 5px;">شرح البطاقة:</div>
+            <div class="pc-desc" id="pc-desc" style="font-size: 1rem; color: #fff; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">وصف البطاقة</div>
         </div>
-        <button class="btn btn-ready" onclick="markReady()">✅ أنا مستعد!</button>
+        <button class="btn btn-flame" onclick="markReady()">🔥 أنا مستعد للتحدي!</button>
     </div>
 </div>
 
