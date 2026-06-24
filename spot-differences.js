@@ -36,7 +36,7 @@ const spotDiff = {
             // Show Golden Overlay
             const overlay = document.createElement('div');
             overlay.className = 'bonus-overlay';
-            overlay.innerHTML = <h1>🚨 جولة ذهبية! 🌟</h1><h2>الإجابة الصحيحة تمنحك  نقاط!</h2>;
+            overlay.innerHTML = `<h1>🚨 جولة ذهبية! 🌟</h1><h2>الإجابة الصحيحة تمنحك ${this.currentMultiplier} نقاط!</h2>`;
             document.body.appendChild(overlay);
             
             setTimeout(() => {
@@ -57,7 +57,7 @@ const spotDiff = {
 
             // Prepare screens and buttons
             app.showScreen('spot-game-screen');
-            document.getElementById('spot-progress').innerText = احسب الفروقات بين اللوحتين واختر الإجابة الصحيحة;
+            document.getElementById('spot-progress').innerText = `احسب الفروقات بين اللوحتين واختر الإجابة الصحيحة`;
             document.getElementById('spot-game-result').classList.add('hidden');
             document.getElementById('spot-next-btn').classList.add('hidden');
             document.getElementById('spot-reveal-btn').classList.remove('hidden');
